@@ -1,0 +1,145 @@
+/* כללי */
+body {
+  margin: 0;
+  font-family: 'Rubik', sans-serif;
+  direction: rtl;
+}
+
+.container {
+  width: 100%;
+  max-width: 1440px;
+  padding-top: 64px;
+  margin: 0 auto;
+  background: white;
+  box-sizing: border-box;
+  padding-bottom: 20px; /* הוספת padding תחתון */
+}
+
+.page-title {
+  text-align: center;
+  color: #0045A3;
+  font-size: 64px;
+  font-weight: 800;
+  line-height: 96px;
+  margin-bottom: 32px;
+}
+
+/* סינונים */
+.filter-section {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.filter-header {
+  color: #0c3058;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.checkbox-item {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #8596AF;
+  position: relative;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #0068F5;
+  border-radius: 2px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.clear-filter-btn {
+  padding: 12px 24px;
+  background: white;
+  border: 1px solid #0068F5;
+  color: #0068F5;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Rubik', sans-serif;
+  margin-top: 16px;
+}
+
+/* חיפוש */
+.search-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.search-input {
+  padding: 12px 16px;
+  border: 1px solid #8596AF;
+  border-radius: 8px;
+  width: 200px;
+  font-family: 'Rubik', sans-serif;
+  text-align: right;
+}
+
+/* תוצאות */
+.results-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* שתי כרטיסיות בשורה */
+  gap: 16px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 16px;
+}
+
+.result-card {
+  background: white;
+  box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 16px;
+  height: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1200px) {
+  .results-container {
+      grid-template-columns: repeat(2, 1fr); /* שתי כרטיסיות בשורה */
+  }
+}
+
+@media (max-width: 768px) {
+  .results-container {
+      grid-template-columns: 1fr; /* אחת בשורה במסכים קטנים */
+  }
+}
+
+@media (max-width: 480px) {
+  .result-card {
+      padding: 8px;
+  }
+}
+

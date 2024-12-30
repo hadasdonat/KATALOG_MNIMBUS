@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>רובד 5 - שירותים מאושרים</title>
+    <link rel="stylesheet" href="GCP.css" />
+  </head>
+  <body>
+    <!-- Add Header -->
+    <header class="header">
+      <div class="header-container">
+        <div>
+          <a href="/">
+            <img
+              class="header-logo"
+              src="https://c.animaapp.com/17bVmHgi/img/-----------1@2x.png"
+              alt="Logo"
+            />
+          </a>
+          <button class="home-button" onclick="window.location.href='/'">לדף הבית</button>
+        </div>
+        <form class="search-form" onsubmit="handleHeaderSearch(event)">
+          <input type="text" id="header-search" placeholder="חיפוש" />
+          <button type="submit" class="search-button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </header>
+
+    <div class="container">
+      <h1 class="page-title">שירותים מאושרים - רובד 5</h1>
+
+      <div class="filter-section">
+        <div class="filter-header">
+          <span style="color: #a72223; font-weight: 500">*</span>
+          <span style="color: #0c3058; font-weight: 500">סינון תוצאות</span>
+        </div>
+
+        <div class="filter-options">
+          <!-- Platform filters -->
+          <label class="checkbox-item">
+            <span>AWS</span>
+            <input type="checkbox" class="checkbox-input" id="aws" />
+            <div class="checkbox-custom"></div>
+          </label>
+          <label class="checkbox-item">
+            <span>GCP</span>
+            <input type="checkbox" class="checkbox-input" id="gcp" />
+            <div class="checkbox-custom"></div>
+          </label>
+          <!-- Service type filters -->
+          <label class="checkbox-item">
+            <span>SaaS</span>
+            <input type="checkbox" class="checkbox-input" id="saas" />
+            <div class="checkbox-custom"></div>
+          </label>
+          <label class="checkbox-item">
+            <span>Non-SaaS</span>
+            <input type="checkbox" class="checkbox-input" id="nonSaas" />
+            <div class="checkbox-custom"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="search-container">
+        <input
+          type="text"
+          class="search-input"
+          id="mainSearch"
+          placeholder="חיפוש"
+        />
+        <select class="search-input" id="categorySearch">
+          <option value="">כל הקטגוריות</option>
+          <option value="internet-of-things">Internet of Things</option>
+          <option value="database">Database</option>
+          <option value="networking">Networking & Content Delivery</option>
+          <option value="business-applications">Business Applications</option>
+          <option value="frontend">Front-End Web & Mobile</option>
+          <option value="integration">Application Integration</option>
+          <option value="end-user-computing">End User Computing</option>
+          <option value="analytics">Analytics</option>
+          <option value="machine-learning">Machine Learning</option>
+          <option value="databases">Databases</option>
+          <option value="migration">Migration</option>
+          <option value="serverless">Serverless</option>
+          <option value="financial">Cloud Financial Management</option>
+          <option value="satellite">Satellite</option>
+          <option value="robotics">Robotics</option>
+          <option value="architecture">Architecture Strategy</option>
+          <option value="marketplace">Marketplace</option>
+          <option value="cloud-erp">Cloud ERP</option>
+        </select>
+      </div>
+
+      <button class="clear-filter-btn" onclick="clearFilters()">
+        נקה סינון
+      </button>
+
+      <div id="results-container" class="results-container">
+        <!-- Results will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Load both data sources
+        Promise.all([
+          fetch("FIVE.json").then((response) => response.json()),
+          fetch("GCP_5.json").then((response) => response.json()),
+        ])
+          .then(([awsData, gcpData]) => {
+            // Get AWS services
+            const awsServices = awsData["שירותים מאושרים - AWS"]
+              .filter((item) => item !== null)
+              .map((item) => ({
+                ...item,
+                platform: "aws",
+              }));
+
+            // Get GCP services
+            const gcpServices = gcpData["שירותים מאושרים - GCP"]
+              .filter((item) => item !== null)
+              .map((item) => ({
+                ...item,
+                platform: "gcp",
+              }));
+
+            // Combine all services
+            const allServices = [...awsServices, ...gcpServices];
+            renderCards(allServices);
+          })
+          .catch((error) => console.error("Error loading data:", error));
+
+        // Initialize filters
+        const filters = {
+          aws: false,
+          gcp: false,
+          saas: false,
+          nonSaas: false,
+          searchText: "",
+          categorySearch: "",
+        };
+
+        // Setup event listeners
+        ["aws", "gcp", "saas", "nonSaas"].forEach((filterId) => {
+          document.getElementById(filterId).addEventListener("change", (e) => {
+            filters[filterId] = e.target.checked;
+            filterResults();
+          });
+        });
+
+        document.getElementById("mainSearch").addEventListener("input", (e) => {
+          filters.searchText = e.target.value;
+          filterResults();
+        });
+
+        document
+          .getElementById("categorySearch")
+          .addEventListener("change", (e) => {
+            filters.categorySearch = e.target.value;
+            filterResults();
+          });
+
+        function renderCards(data) {
+          const container = document.getElementById("results-container");
+          if (!data || data.length === 0) {
+            container.innerHTML =
+              '<div class="no-results">לא נמצאו תוצאות</div>';
+            return;
+          }
+
+          container.innerHTML = data
+            .map(
+              (item) => `
+                    <div class="result-card" 
+                         data-platform="${item.platform}"
+                         data-service-type="${item.Column7}"
+                         data-company="${item.Column3}"
+                         data-manufacturer="${item.Column4}">
+                        <div class="platform-badge">${item.platform.toUpperCase()}</div>
+                        <h3>${item.Column5 || "ללא שם"}</h3>
+                        <p class="description">${
+                          item.Column6 || "ללא תיאור"
+                        }</p>
+                        <div class="details">
+                            <p><strong>חברה:</strong> ${item.Column3 || ""}</p>
+                            <p><strong>יצרן:</strong> ${item.Column4 || ""}</p>
+                            <p><strong>סוג שירות:</strong> ${
+                              item.Column7 || ""
+                            }</p>
+                            <p><strong>איש קשר:</strong> ${
+                              item.Column10 || ""
+                            }</p>
+                            <p><strong>מועד אישור:</strong> ${
+                              item.Column11 || ""
+                            }</p>
+                            ${
+                              item.Column12
+                                ? `<p class="notes"><strong>הערות:</strong> ${item.Column12}</p>`
+                                : ""
+                            }
+                        </div>
+                    </div>
+                `
+            )
+            .join("");
+        }
+
+        function clearFilters() {
+        filters = {
+          israel: false,
+          abroad: false,
+          saas: false,
+          nonSaas: false,
+          searchText: "",
+          categorySearch: "",
+        };
+
+        document.getElementById("israel").checked = false;
+        document.getElementById("abroad").checked = false;
+        document.getElementById("saas").checked = false;
+        document.getElementById("nonSaas").checked = false;
+        document.getElementById("mainSearch").value = "";
+        document.getElementById("categorySearch").value = "";
+
+        filterResults();
+      }
+        function filterResults() {
+          const cards = document.querySelectorAll(".result-card");
+          const searchText = filters.searchText.toLowerCase();
+          const categoryText = filters.categorySearch.toLowerCase();
+
+          cards.forEach((card) => {
+            const text = card.textContent.toLowerCase();
+            const platform = card.dataset.platform;
+            const serviceType = card.dataset.serviceType?.toLowerCase();
+
+            const platformMatch =
+              (!filters.aws && !filters.gcp) ||
+              (filters.aws && platform === "aws") ||
+              (filters.gcp && platform === "gcp");
+
+            const serviceTypeMatch =
+              (!filters.saas && !filters.nonSaas) ||
+              (filters.saas && serviceType === "saas") ||
+              (filters.nonSaas && serviceType === "non-saas");
+
+            const searchMatch = !searchText || text.includes(searchText);
+
+            const categoryMatch =
+              !categoryText || serviceType?.includes(categoryText);
+
+            card.style.display =
+              platformMatch && serviceTypeMatch && searchMatch && categoryMatch
+                ? "block"
+                : "none";
+          });
+        }
+      });
+      
+      function handleHeaderSearch(e) {
+        e.preventDefault();
+        const query = document.getElementById("header-search").value.trim();
+        if (query) {
+          window.location.href = `/search?q=${encodeURIComponent(query)}`;
+        }
+      }
+    </script>
+  </body>
+</html>

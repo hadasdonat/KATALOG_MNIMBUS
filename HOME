@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>קטלוג מוצרי נימבוס</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Rubik', sans-serif;
+        background-color: white;
+      }
+
+      .container {
+        width: 1440px;
+        margin: 0 auto;
+        position: relative;
+        padding: 20px;
+        background-color: white;
+      }
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        border-bottom: 1px solid #dcdcdc;
+      }
+
+      .header img {
+        height: 36px;
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #8596af;
+        border-radius: 50px;
+        padding: 10px 20px;
+        width: 300px;
+      }
+
+      .search-bar input {
+        border: none;
+        outline: none;
+        flex-grow: 1;
+        font-size: 14px;
+      }
+
+      .search-bar svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .title {
+        text-align: center;
+        font-size: 48px;
+        font-weight: 800;
+        color: #0045a3;
+        margin: 40px 0;
+      }
+
+      .main {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .cards {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        width: 400px;
+        height: 100px;
+        border-radius: 8px;
+        box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: #ffffff;
+      }
+
+      .card-content {
+        text-align: right;
+      }
+
+      .card-title {
+        font-size: 20px;
+        font-weight: 500;
+        color: #0c3058;
+      }
+
+      .card-subtitle {
+        font-size: 14px;
+        color: #5878a4;
+      }
+
+      .card img {
+        width: 80px;
+        height: auto;
+      }
+
+      .filters {
+        width: 300px;
+      }
+
+      .filter-group {
+        margin-bottom: 16px;
+      }
+
+      .filter-group span {
+        font-weight: 500;
+        color: #0c3058;
+        margin-bottom: 8px;
+        display: block;
+      }
+
+      .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .checkbox input {
+        width: 16px;
+        height: 16px;
+      }
+
+      .dropdown {
+        margin-bottom: 16px;
+      }
+
+      .dropdown select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #8596af;
+        border-radius: 4px;
+      }
+
+      .button {
+        background-color: #0045a3;
+        color: white;
+        font-size: 16px;
+        padding: 12px;
+        width: 100%;
+        text-align: center;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .button:hover {
+        background-color: #003b8c;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="https://via.placeholder.com/123x37" alt="Nimbus Logo" />
+        <div class="search-bar">
+          <input type="text" placeholder="חיפוש" />
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="title">ברוכים הבאים לקטלוג מוצרי נימבוס</div>
+
+      <div class="main">
+        <div class="cards">
+          <div class="card">
+            <div class="card-content">
+              <div class="card-title">רובד 5</div>
+              <div class="card-subtitle"></div>
+            </div>
+            <img src="https://via.placeholder.com/96x100" alt="Card Image" />
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <div class="card-title">GCP</div>
+              <div class="card-subtitle">לקטגוריות</div>
+            </div>
+            <img src="https://via.placeholder.com/96x100" alt="Card Image" />
+          </div>
+          <div class="card">
+            <div class="card-content">
+              <div class="card-title">AWS</div>
+              <div class="card-subtitle">לקטגוריות</div>
+            </div>
+            <img src="https://via.placeholder.com/96x100" alt="Card Image" />
+          </div>
+        </div>
+
+        <div class="filters">
+          <div class="filter-group">
+            <span>סינון תוצאות</span>
+            <div class="checkbox-group">
+              <label class="checkbox">
+                <input type="checkbox" /> בארץ
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" /> חו"ל
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" /> No-Saas
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" /> Saas
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" /> GCP
+              </label>
+              <label class="checkbox">
+                <input type="checkbox" /> AWS
+              </label>
+            </div>
+          </div>
+
+          <div class="dropdown">
+            <select>
+              <option>בחירת קטגוריה</option>
+              <option>קטגוריה 1</option>
+              <option>קטגוריה 2</option>
+            </select>
+          </div>
+
+          <div class="button">חפש</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

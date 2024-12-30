@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <title>תוצאות מוצרי נימבוס</title>
+    <link rel="stylesheet" href="GCP.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-container">
+        <div>
+          <a href="/">
+            <img class="header-logo" src="https://c.animaapp.com/17bVmHgi/img/-----------1@2x.png" alt="Logo" />
+          </a>
+          <button class="home-button" onclick="window.location.href='/'">לדף הבית</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="container">
+      <h1 class="page-title">תוצאות מוצרי נימבוס</h1>
+
+      <div id="results-container" class="results-container">
+        <!-- Results will be dynamically inserted here -->
+      </div>
+    </div>
+
+    <script>
+      // סינון תוצאות לפי הפרמטרים שנשלחו בשורת הכתובת
+      document.addEventListener("DOMContentLoaded", function () {
+        const params = new URLSearchParams(window.location.search);
+
+        // שליפת כל הסינונים שנבחרו בדף החיפוש
+        const filters = {
+          query: params.get("query") || "",
+          israel: params.get("israel") === "true",
+          abroad: params.get("abroad") === "true",
+          saas: params.get("saas") === "true",
+          nonSaas: params.get("nonSaas") === "true",
+          categorySearch: params.get("categorySearch") || "",
+        };
+
+        // טוענים את הנתונים מהקבצים
+        Promise.all([
+          fetch("FIVE.json").then((response) => response.json()),
+          fetch("mergedAWS.json").then((response) => response.json())
+        ])
+          .then(([data1, data2]) => {
+            const combinedData = [
+              ...data1["שירותים מאושרים - AWS"], // הנתונים מקובץ ראשון
+              ...data2 || []
+            ];
+            renderCards(combinedData, filters); // מציגים את התוצאות לאחר סינון
+          })
+          .catch((error) => console.error("Error loading data:", error));
+      });
+
+      // פונקציה להציג את התוצאות אחרי סינון
+      function renderCards(data, filters) {
+        const container = document.getElementById("results-container");
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="no-results">לא נמצאו תוצאות</div>';
+          return;
+        }
+
+        container.innerHTML = data
+          .map((item) => {
+            if (!item) return ""; // דילוג על אובייקטים ריקים או null
+
+            // בדיקת התאמת סינון
+            const matchQuery = item.Column5.toLowerCase().includes(filters.query.toLowerCase());
+            const matchIsrael = filters.israel && item.Column7 === "Israel";
+            const matchAbroad = filters.abroad && item.Column7 !== "Israel";
+            const matchSaas = filters.saas && item.Column7 === "Saas";
+            const matchNonSaas = filters.nonSaas && item.Column7 === "Non-Saas";
+            const matchCategory = filters.categorySearch ? item.Column8.includes(filters.categorySearch) : true;
+
+            // אם התוצאה מתאימה לסינונים, מציגים אותה
+            if (
+              matchQuery && 
+              (matchIsrael || matchAbroad) && 
+              (matchSaas || matchNonSaas) &&
+              matchCategory
+            ) {
+              return `
+                <div class="result-card">
+                  <h3>${item.Column5 || "ללא שם"}</h3>
+                  <p>${item.Column6 || "ללא תיאור"}</p>
+                  <p><strong>חברה:</strong> ${item.Column3 || ""}</p>
+                  <p><strong>יצרן:</strong> ${item.Column4 || ""}</p>
+                </div>
+              `;
+            }
+            return "";
+          })
+          .join("");
+      }
+    </script>
+  </body>
+</html>

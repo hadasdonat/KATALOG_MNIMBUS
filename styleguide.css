@@ -1,0 +1,73 @@
+:root {
+    --display-hero-font-family: "Rubik", Helvetica;
+    --display-hero-font-weight: 800;
+    --display-hero-font-size: 64px;
+    --display-hero-letter-spacing: 0px;
+    --display-hero-line-height: 150%;
+    --display-hero-font-style: normal;
+    --body-regular-font-family: "Rubik", Helvetica;
+    --body-regular-font-weight: 400;
+    --body-regular-font-size: 16px;
+    --body-regular-letter-spacing: 0px;
+    --body-regular-line-height: 125%;
+    --body-regular-font-style: normal;
+    --title-small-font-family: "Rubik", Helvetica;
+    --title-small-font-weight: 500;
+    --title-small-font-size: 18px;
+    --title-small-letter-spacing: 0px;
+    --title-small-line-height: 24px;
+    --title-small-font-style: normal;
+    --label-regular-font-family: "Rubik", Helvetica;
+    --label-regular-font-weight: 400;
+    --label-regular-font-size: 14px;
+    --label-regular-letter-spacing: 0px;
+    --label-regular-line-height: 125%;
+    --label-regular-font-style: normal;
+    --desktop-regular-500-font-family: "Rubik", Helvetica;
+    --desktop-regular-500-font-weight: 500;
+    --desktop-regular-500-font-size: 16px;
+    --desktop-regular-500-letter-spacing: 0px;
+    --desktop-regular-500-line-height: 24px;
+    --desktop-regular-500-font-style: normal;
+    --body-medium-font-family: "Rubik", Helvetica;
+    --body-medium-font-weight: 500;
+    --body-medium-font-size: 16px;
+    --body-medium-letter-spacing: 0px;
+    --body-medium-line-height: 125%;
+    --body-medium-font-style: normal;
+    --shadow-level1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px
+      rgba(0, 0, 0, 0.3);
+    --colors-text-icon-link-primary-hover: var(--primitive-colors-israel-blue-700);
+    --colors-text-icon-subtle-primary: var(--primitive-colors-dawn-blue-900);
+    --colors-text-icon-subtle-secondary: var(--primitive-colors-mist-blue-600);
+    --colors-text-icon-faliure: var(--primitive-colors-coral-red-700);
+    --colors-text-icon-link-primary-default: var(
+      --primitive-colors-israel-blue-500
+    );
+    --colors-background-neutral-default: var(--primitive-colors-white-000);
+    --colors-border-subtle-default: var(--primitive-colors-bright-grey-500);
+    --colors-background-scroller: var(--primitive-colors-bright-grey-500);
+    --colors-border-brand-default: var(--primitive-colors-israel-blue-500);
+    --border-radius-full: 100px;
+    --border-radius-m: 8px;
+    --spacing-xxxs: 4px;
+    --space-space-600: 24px;
+    --space-space-400: 12px;
+    --space-space-500: 16px;
+    --space-space-300: 8px;
+    --space-space-200: 4px;
+    --primitive-colors-israel-blue-700: rgba(0, 69, 163, 1);
+    --primitive-colors-dawn-blue-900: rgba(12, 48, 88, 1);
+    --primitive-colors-mist-blue-600: rgba(88, 120, 164, 1);
+    --primitive-colors-coral-red-700: rgba(167, 34, 35, 1);
+    --primitive-colors-israel-blue-500: rgba(0, 104, 245, 1);
+    --primitive-colors-white-000: rgba(255, 255, 255, 1);
+    --primitive-colors-border-radius-full: 100px;
+    --primitive-colors-space-space-2xs: 8px;
+    --primitive-colors-bright-grey-500: rgba(133, 150, 175, 1);
+    --primitive-colors-space-space-zero: 0px;
+    --colors-background-neutral-default-duplicate: var(
+      --primitive-colors-white-000
+    );
+  }
+  
