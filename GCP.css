@@ -1,7 +1,14 @@
 body {
-    margin: 0;
+    /* margin: 0;
     font-family: 'Rubik', sans-serif;
     direction: rtl;
+    width: 100vw; /* 100% מרוחב המסך */
+    /* height: 100vh; /* 100% מגובה המסך */
+    /* overflow-x: hidden; מונע גלילה אופקית */ */ */
+    font-family: 'Rubik', sans-serif;
+    background-color: white;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
@@ -32,7 +39,7 @@ body {
 .filter-section {
   position: absolute;
   left: 923px;
-  top: 292px;
+  top: 285px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -49,9 +56,11 @@ body {
 
 .checkbox-item {
     display: flex;
-    justify-content: flex-end;
+    flex-direction: row-reverse; /* הפוך את סדר האלמנטים */
+    justify-content: flex-start;
     align-items: center;
-    gap: 8px;
+    gap: 8px; /* ריווח בין תיבת הסימון למלל */
+
 }
 
 .checkbox-input {
@@ -82,7 +91,7 @@ body {
 .search-container {
     position: absolute;
     left: 395px;
-    top: 315px;
+    top: 320px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -136,8 +145,9 @@ body {
     left: 85px;
     right: 85px;
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    flex-wrap: wrap; /* מאפשר שבירה לשורות */
+    gap: 16px; /* ריווח בין הכרטיסיות */
+    justify-content: space-between; /* מסדר את הכרטיסיות באופן שווה */
 }
 
 .result-card {
@@ -145,6 +155,8 @@ body {
     box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     padding: 24px;
+    flex: 1 1 calc(50% - 16px); /* גודל כרטיסיה: חצי רוחב */
+    box-sizing: border-box; /* מבטיח שהריווח יילקח בחשבון */
 }
 
 select.search-input {

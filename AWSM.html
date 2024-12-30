@@ -17,8 +17,9 @@
               alt="Logo"
             />
           </a>
-          <button class="home-button" onclick="window.location.href='/'">לדף הבית</button>
-        </div>
+          <button class="home-button"   style="position: absolute; top: 90px; right: 70px;"
+          onclick="location.href='יי.html'">לדף הבית</button>
+                </div>
         <form class="search-form" onsubmit="handleHeaderSearch(event)">
           <input type="text" id="header-search" placeholder="חיפוש" />
           <button type="submit" class="search-button">
@@ -44,7 +45,7 @@
       <div class="filter-section">
         <div class="filter-header">
           <span style="color: #a72223; font-weight: 500">*</span>
-          <span style="color: #0c3058; font-weight: 500">סינון תוצאות</span>
+          <!-- <span style="color: #0c3058; font-weight: 500">סינון תוצאות</span> -->
         </div>
 
         <div class="filter-options">
@@ -129,6 +130,7 @@
     fetch("mergedAWS.json").then((response) => response.json()) // החלף בשם הקובץ השני
   ])
   .then(([data1, data2]) => {
+    
             // Filter only Google/GCP products
             const combinedData = [
         ...data1["שירותים מאושרים - AWS"], // הנתונים מקובץ ראשון

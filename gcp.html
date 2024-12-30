@@ -17,8 +17,9 @@
               alt="Logo"
             />
           </a>
-          <button class="home-button" onclick="window.location.href='/'">לדף הבית</button>
-        </div>
+          <button class="home-button"   style="position: absolute; top: 90px; right: 70px;"
+          onclick="window.location.href='/'">לדף הבית</button>
+                </div>
         <form class="search-form" onsubmit="handleHeaderSearch(event)">
           <input type="text" id="header-search" placeholder="חיפוש" />
           <button type="submit" class="search-button">
@@ -232,18 +233,7 @@
             .join("");
         }
 
-        // function clearFilters() {
-        //   Object.keys(filters).forEach((key) => {
-        //     filters[key] = false;
-        //     const element = document.getElementById(key);
-        //     if (element) element.checked = false;
-        //   });
-
-        //   document.getElementById("mainSearch").value = "";
-        //   document.getElementById("categorySearch").value = "";
-
-        //   filterResults();
-        // }
+       
 
         function filterResults() {
           const cards = document.querySelectorAll(".result-card");
@@ -280,7 +270,7 @@
                 : "none";
           });
         }
-        function clearFilters() {
+    function clearFilters() {
     // Reset all filter values
     filters = {
       israel: false,
@@ -307,7 +297,7 @@
     filterResults();
   }
 
-        function handleHeaderSearch(e) {
+    function handleHeaderSearch(e) {
           e.preventDefault();
           const query = document.getElementById("header-search").value.trim();
           if (query) {
