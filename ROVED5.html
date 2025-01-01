@@ -17,8 +17,8 @@
               alt="Logo"
             />
           </a>
-          <button class="home-button"   style="position: absolute; top: 110px; right: 70px;"
-          onclick="window.location.href='/'">לדף הבית</button>
+          <button class="home-button"   style="position: absolute; top: 90px; right: 70px;"
+          onclick="location.href='index.html'">לדף הבית</button>
         </div>
         <form class="search-form" onsubmit="handleHeaderSearch(event)">
           <input type="text" id="header-search" placeholder="חיפוש" />
@@ -44,8 +44,8 @@
 
       <div class="filter-section">
         <div class="filter-header">
-          <span style="color: #a72223; font-weight: 500">*</span>
-          <span style="color: #0c3058; font-weight: 500">סינון תוצאות</span>
+          <span style="color: #fffdfd; font-weight: 500">*</span>
+          <span style="color: #ffffff; font-weight: 500">סינון תוצאות</span>
         </div>
 
         <div class="filter-options">
@@ -83,24 +83,24 @@
         />
         <select class="search-input" id="categorySearch">
           <option value="">כל הקטגוריות</option>
-          <option value="internet-of-things">Internet of Things</option>
-          <option value="database">Database</option>
-          <option value="networking">Networking & Content Delivery</option>
-          <option value="business-applications">Business Applications</option>
-          <option value="frontend">Front-End Web & Mobile</option>
-          <option value="integration">Application Integration</option>
-          <option value="end-user-computing">End User Computing</option>
-          <option value="analytics">Analytics</option>
-          <option value="machine-learning">Machine Learning</option>
-          <option value="databases">Databases</option>
-          <option value="migration">Migration</option>
-          <option value="serverless">Serverless</option>
-          <option value="financial">Cloud Financial Management</option>
-          <option value="satellite">Satellite</option>
-          <option value="robotics">Robotics</option>
-          <option value="architecture">Architecture Strategy</option>
-          <option value="marketplace">Marketplace</option>
-          <option value="cloud-erp">Cloud ERP</option>
+          <option value="internet-of-things">האינטרנט של הדברים</option>
+          <option value="database">מאגרי מידע</option>
+          <option value="networking">רשתות והעברת תוכן</option>
+          <option value="business-applications">אפליקציות עסקיות</option>
+          <option value="frontend">פרונט-אנד - אתרי אינטרנט וניידים</option>
+          <option value="integration">אינטגרציה של אפליקציות</option>
+          <option value="end-user-computing">מחשוב למשתמשי קצה</option>
+          <option value="analytics">אנליטיקה</option>
+          <option value="machine-learning">למידת מכונה</option>
+          <option value="databases">מסדי נתונים</option>
+          <option value="migration">העברת נתונים</option>
+          <option value="serverless">ללא שרת</option>
+          <option value="financial">ניהול פיננסי בענן</option>
+          <option value="satellite">לוויינים</option>
+          <option value="robotics">רובוטיקה</option>
+          <option value="architecture">אסטרטגיית ארכיטקטורה</option>
+          <option value="marketplace">שוק</option>
+          <option value="cloud-erp">ERP בענן</option>
         </select>
       </div>
 
@@ -114,6 +114,15 @@
     </div>
 
     <script>
+      // Initialize filters
+      let filters = {
+          aws: false,
+          gcp: false,
+          saas: false,
+          nonSaas: false,
+          searchText: "",
+          categorySearch: "",
+        };
       document.addEventListener("DOMContentLoaded", function () {
         // Load both data sources
         Promise.all([
@@ -143,15 +152,7 @@
           })
           .catch((error) => console.error("Error loading data:", error));
 
-        // Initialize filters
-        const filters = {
-          aws: false,
-          gcp: false,
-          saas: false,
-          nonSaas: false,
-          searchText: "",
-          categorySearch: "",
-        };
+        
 
         // Setup event listeners
         ["aws", "gcp", "saas", "nonSaas"].forEach((filterId) => {
@@ -218,18 +219,28 @@
             .join("");
         }
 
-        function clearFilters() {
+        
+      });
+      
+      function handleHeaderSearch(e) {
+        e.preventDefault();
+        const query = document.getElementById("header-search").value.trim();
+        if (query) {
+          window.location.href = `/search?q=${encodeURIComponent(query)}`;
+        }
+      }
+      function clearFilters() {
         filters = {
-          israel: false,
-          abroad: false,
+          aws: false,
+          gcp: false,
           saas: false,
           nonSaas: false,
           searchText: "",
           categorySearch: "",
         };
 
-        document.getElementById("israel").checked = false;
-        document.getElementById("abroad").checked = false;
+        document.getElementById("aws").checked = false;
+        document.getElementById("gcp").checked = false;
         document.getElementById("saas").checked = false;
         document.getElementById("nonSaas").checked = false;
         document.getElementById("mainSearch").value = "";
@@ -268,15 +279,6 @@
                 : "none";
           });
         }
-      });
-      
-      function handleHeaderSearch(e) {
-        e.preventDefault();
-        const query = document.getElementById("header-search").value.trim();
-        if (query) {
-          window.location.href = `/search?q=${encodeURIComponent(query)}`;
-        }
-      }
     </script>
   </body>
 </html>

@@ -67,7 +67,7 @@
         .search-btn {
             position: absolute;
             top: 780px;
-            right: 90px;
+            right: 280px;
             background: #0045A3;
             color: white;
             border: none;
@@ -80,13 +80,15 @@
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    background-color: #ffffff; /* רקע לבן */
+    color: #0C3058; /* צבע טקסט כהה */
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     /* background-position: left 1rem center; */
     background-size: 1em;
     position: absolute; /* או relative בהתאם למבנה */
     top: 700px; /* המרחק מלמעלה */
-    right: 90px; /* המרחק מצד שמאל */
+    right: 60px; /* המרחק מצד שמאל */
     padding-left: 2.5rem;
     cursor: pointer;
 }
@@ -98,13 +100,15 @@ select.search-input::-ms-expand {
 select.search-input option {
     font-family: Rubik;
     font-size: 16px;
+    color: #0C3058; /* צבע טקסט */
+    background-color: white; /* רקע לבן */
     padding: 8px;
 }
 
         .free-text {
             position: absolute;
             top: 459px;
-            right: 103px;
+            right: 90px;
             width: 300px;
         }
         .free-text input {
@@ -156,25 +160,6 @@ select.search-input option {
             gap: 16px;
             margin-bottom: 16px;
         }
-        .home-button {
-    padding: 8px 16px;
-    background: #0045A3;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: 'Rubik', sans-serif;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    transition: background-color 0.2s;
-}
-
-.home-button:hover {
-    background: #003c8a;
-}
-
         
     </style>
 </head>
@@ -187,7 +172,7 @@ select.search-input option {
                 <h3>AWS</h3>
                 <p>לקטגוריות</p>
             </div>
-            <img src="https://via.placeholder.com/96x100" alt="AWS">
+            <img src="images\AWS-Emblem.png" alt="AWS">
         </div>
 
         <div class="card" style="top:604px;left:103px;" onclick="location.href='gcp.html';">
@@ -195,14 +180,14 @@ select.search-input option {
                 <h3>GCP</h3>
                 <p>לקטגוריות</p>
             </div>
-            <img src="https://via.placeholder.com/96x100" alt="GCP">
+            <img src="images\OIP.jpeg" alt="GCP">
         </div>
 
         <div class="card" style="top:459px;left:103px;" onclick="location.href='ROVED5.html';">
             <div class="card-content">
                 <h3>רובד 5</h3>
             </div>
-            <img src="https://via.placeholder.com/96x100" alt="רובד 5">
+            <img src="" alt="רובד 5">
         </div>
 
         <div class="free-text">
@@ -227,31 +212,29 @@ select.search-input option {
                 <div class="checkbox-box" onclick="toggleCheckbox(this)"></div>
             </div>
         </div>
-        <button class="home-button"   style="position: absolute; top: 90px; right: 70px;"
-          onclick="window.location.href='/'">לדף הבית</button>
-                </div>
+      
 
 
-        <select class="search-input" style="background-color: #f0f0f0; border: 1px solid #8596AF; border-radius: 8px; padding: 12px; width: 300px;" id="categorySearch">
-          <option value="">כל הקטגוריות</option>
-          <option value="internet-of-things">Internet of Things</option>
-          <option value="database">Database</option>
-          <option value="networking">Networking & Content Delivery</option>
-          <option value="business-applications">Business Applications</option>
-          <option value="frontend">Front-End Web & Mobile</option>
-          <option value="integration">Application Integration</option>
-          <option value="end-user-computing">End User Computing</option>
-          <option value="analytics">Analytics</option>
-          <option value="machine-learning">Machine Learning</option>
-          <option value="databases">Databases</option>
-          <option value="migration">Migration</option>
-          <option value="serverless">Serverless</option>
-          <option value="financial">Cloud Financial Management</option>
-          <option value="satellite">Satellite</option>
-          <option value="robotics">Robotics</option>
-          <option value="architecture">Architecture Strategy</option>
-          <option value="marketplace">Marketplace</option>
-          <option value="cloud-erp">Cloud ERP</option>
+        <select class="search-input" style="background-color: #ffffff; border: 1px solid #8596AF; border-radius: 8px; padding: 12px; width: 300px;" id="categorySearch">
+            <option value="">כל הקטגוריות</option>
+            <option value="internet-of-things">האינטרנט של הדברים</option>
+            <option value="database">מאגרי מידע</option>
+            <option value="networking">רשתות והעברת תוכן</option>
+            <option value="business-applications">אפליקציות עסקיות</option>
+            <option value="frontend">פרונט-אנד - אתרי אינטרנט וניידים</option>
+            <option value="integration">אינטגרציה של אפליקציות</option>
+            <option value="end-user-computing">מחשוב למשתמשי קצה</option>
+            <option value="analytics">אנליטיקה</option>
+            <option value="machine-learning">למידת מכונה</option>
+            <option value="databases">מסדי נתונים</option>
+            <option value="migration">העברת נתונים</option>
+            <option value="serverless">ללא שרת</option>
+            <option value="financial">ניהול פיננסי בענן</option>
+            <option value="satellite">לוויינים</option>
+            <option value="robotics">רובוטיקה</option>
+            <option value="architecture">אסטרטגיית ארכיטקטורה</option>
+            <option value="marketplace">שוק</option>
+            <option value="cloud-erp">ERP בענן</option>
         </select>
       </div>
 

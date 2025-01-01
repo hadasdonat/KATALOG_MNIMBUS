@@ -18,7 +18,7 @@
             />
           </a>
           <button class="home-button"   style="position: absolute; top: 90px; right: 70px;"
-          onclick="location.href='יי.html'">לדף הבית</button>
+          onclick="location.href='index.html'">לדף הבית</button>
                 </div>
         <form class="search-form" onsubmit="handleHeaderSearch(event)">
           <input type="text" id="header-search" placeholder="חיפוש" />
@@ -44,8 +44,8 @@
 
       <div class="filter-section">
         <div class="filter-header">
-          <span style="color: #a72223; font-weight: 500">*</span>
-          <!-- <span style="color: #0c3058; font-weight: 500">סינון תוצאות</span> -->
+          <span style="color: #ffffff; font-weight: 500">*</span>
+          <span style="color: #ffffff; font-weight: 500">סינון תוצאות</span>
         </div>
 
         <div class="filter-options">
@@ -91,24 +91,24 @@
         />
         <select class="search-input" id="categorySearch">
           <option value="">כל הקטגוריות</option>
-          <option value="internet-of-things">Internet of Things</option>
-          <option value="database">Database</option>
-          <option value="networking">Networking & Content Delivery</option>
-          <option value="business-applications">Business Applications</option>
-          <option value="frontend">Front-End Web & Mobile</option>
-          <option value="integration">Application Integration</option>
-          <option value="end-user-computing">End User Computing</option>
-          <option value="analytics">Analytics</option>
-          <option value="machine-learning">Machine Learning</option>
-          <option value="databases">Databases</option>
-          <option value="migration">Migration</option>
-          <option value="serverless">Serverless</option>
-          <option value="financial">Cloud Financial Management</option>
-          <option value="satellite">Satellite</option>
-          <option value="robotics">Robotics</option>
-          <option value="architecture">Architecture Strategy</option>
-          <option value="marketplace">Marketplace</option>
-          <option value="cloud-erp">Cloud ERP</option>
+          <option value="internet-of-things">האינטרנט של הדברים</option>
+          <option value="database">מאגרי מידע</option>
+          <option value="networking">רשתות והעברת תוכן</option>
+          <option value="business-applications">אפליקציות עסקיות</option>
+          <option value="frontend">פרונט-אנד - אתרי אינטרנט וניידים</option>
+          <option value="integration">אינטגרציה של אפליקציות</option>
+          <option value="end-user-computing">מחשוב למשתמשי קצה</option>
+          <option value="analytics">אנליטיקה</option>
+          <option value="machine-learning">למידת מכונה</option>
+          <option value="databases">מסדי נתונים</option>
+          <option value="migration">העברת נתונים</option>
+          <option value="serverless">ללא שרת</option>
+          <option value="financial">ניהול פיננסי בענן</option>
+          <option value="satellite">לוויינים</option>
+          <option value="robotics">רובוטיקה</option>
+          <option value="architecture">אסטרטגיית ארכיטקטורה</option>
+          <option value="marketplace">שוק</option>
+          <option value="cloud-erp">ERP בענן</option>
         </select>
       </div>
 
@@ -123,31 +123,47 @@
 
     <script>
     
+        let filters = {
+      israel: false,
+      abroad: false,
+      saas: false,
+      nonSaas: false,
+      layer1:false,
+      layer5:false,
+      searchText: "",
+      categorySearch: "",
+    };
+
 
     document.addEventListener("DOMContentLoaded", function () {
-  Promise.all([
-    fetch("FIVE.json").then((response) => response.json()),
-    fetch("mergedAWS.json").then((response) => response.json()) // החלף בשם הקובץ השני
-  ])
-  .then(([data1, data2]) => {
+      const regionMapping = {
+          "ap-east-1": "בישראל",
+        };
+      Promise.all([
+        fetch("FIVE.json").then((response) => response.json()),
+        fetch("mergedAWS.json").then((response) => response.json()), // החלף בשם הקובץ השני
+        fetch("ragion.json").then((response) => response.json()), // קובץ הג'ייסון החדש
+
+      ])
+      .then(([data1, data2,locationData]) => {
     
             // Filter only Google/GCP products
             const combinedData = [
         ...data1["שירותים מאושרים - AWS"], // הנתונים מקובץ ראשון
         ...data2 || []
         ];
-      renderCards(combinedData); // שליחת הנתונים לפונקציה להצגה
+      renderCards(combinedData,locationData); // שליחת הנתונים לפונקציה להצגה
           })
           .catch((error) => console.error("Error loading data:", error));
         // Initialize filters
-        const filters = {
-          israel: false,
-          abroad: false,
-          saas: false,
-          nonSaas: false,
-          searchText: "",
-          categorySearch: "",
-        };
+        // const filters = {
+        //   israel: false,
+        //   abroad: false,
+        //   saas: false,
+        //   nonSaas: false,
+        //   searchText: "",
+        //   categorySearch: "",
+        // };
 
         // Setup event listeners
         ["israel", "abroad", "saas", "nonSaas"].forEach((filterId) => {
@@ -178,7 +194,14 @@
           filterResults();
         });
 
-        function renderCards(data) {
+        function renderCards(data,locationData) {
+          const prices = locationData.prices;
+          if (!Array.isArray(prices)) {
+            console.error("locationData.prices is not an array:", prices);
+            return;
+          }
+
+
           const container = document.getElementById("results-container");
           if (!data || data.length === 0) {
             container.innerHTML =
@@ -232,6 +255,10 @@
         const productUrl = item.additionalFields.productUrl || "#";
         const regions = item.regions?.join(", ") || "לא זמין";
 
+
+         // חיפוש באזור מתוך `prices`
+      const regionInfo = prices.find((priceItem) => priceItem.id === item.id);
+      const region = regionInfo ? regionMapping[regionInfo.attributes["aws:region"]] || " בארץ" : "חול ";
         return `
           <div class="result-card" 
                 data-source="aws-second-json"
@@ -240,7 +267,7 @@
               <p class="description">${productSummary}</p>
               <div class="details">
                   <p><strong>קטגוריה:</strong> ${productCategory}</p>
-                  <p><strong>אזורים:</strong> ${regions}</p>
+                  <p><strong>אזורים:</strong> ${region}</p>
                   <a href="${productUrl}" target="_blank" class="more-info">למידע נוסף</a>
               </div>
           </div>
@@ -254,8 +281,28 @@
 
 
        
-function filterResults() {
+
+    
+
+        function handleHeaderSearch(e) {
+          e.preventDefault();
+          const query = document.getElementById("header-search").value.trim();
+          if (query) {
+            window.location.href = `/search?q=${encodeURIComponent(query)}`;
+          }
+        }
+      });
+  function filterResults() {
+
   const cards = document.querySelectorAll(".result-card");
+
+   // אם אין פילטרים פעילים, הצג את כל הכרטיסיות
+   if (Object.values(filters).every((value) => !value)) {
+    cards.forEach((card) => {
+      card.style.display = "block";
+    });
+    return;
+  }
   const searchText = filters.searchText?.toLowerCase() || "";
   const categoryText = filters.categorySearch?.toLowerCase() || "";
 
@@ -305,13 +352,15 @@ function filterResults() {
         : "none";
   });
 }
-        function clearFilters() {
+          function clearFilters() {
     // Reset all filter values
     filters = {
       israel: false,
       abroad: false,
       saas: false,
       nonSaas: false,
+      layer1:false,
+      layer5:false,
       searchText: "",
       categorySearch: "",
     };
@@ -321,6 +370,11 @@ function filterResults() {
     document.getElementById("abroad").checked = false;
     document.getElementById("saas").checked = false;
     document.getElementById("nonSaas").checked = false;
+    document.getElementById("layer1").checked = false;
+    document.getElementById("layer5").checked = false;
+
+
+
 
     // Reset the search input
     document.getElementById("mainSearch").value = "";
@@ -331,16 +385,6 @@ function filterResults() {
     // Trigger a re-render of the filtered results
     filterResults();
   }
-
-        function handleHeaderSearch(e) {
-          e.preventDefault();
-          const query = document.getElementById("header-search").value.trim();
-          if (query) {
-            window.location.href = `/search?q=${encodeURIComponent(query)}`;
-          }
-        }
-      });
-
 
     </script>
   </body>
