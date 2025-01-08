@@ -202,7 +202,7 @@
 
     document.addEventListener("DOMContentLoaded", function () {
       const regionMapping = {
-          "ap-east-1": "בישראל",
+          "ap-east-1": "ישראל",
         };
       Promise.all([
         fetch("FIVE.json").then((response) => response.json()),
@@ -392,8 +392,8 @@
 
 
          // חיפוש באזור מתוך `prices`
-      const regionInfo = prices.find((priceItem) => priceItem.id === item.id);
-      const region = regionInfo ? regionMapping[regionInfo.attributes["aws:region"]] || " בארץ" : "חול ";
+      const regionInfo = prices.find((priceItem) => priceItem.id.includes(item.name));
+      const region = regionInfo ? regionMapping[regionInfo.attributes["aws:region"]] || "ישראל" : "חול";
         return `
           <div class="result-card" 
                 data-source="aws-second-json"
@@ -505,7 +505,7 @@ function sortResults(criteria) {
 
     // בדיקת מיקום
     let locationMatch = true;
-    if (filters.abroad && location !== "חול ") locationMatch = false; // For some reason the space is crucial :(
+    if (filters.abroad && location !== "חול") locationMatch = false;
     if (filters.israel && location !== "ישראל") locationMatch = false;
 
     // סינון לפי רובד (אפשרות לרמות מרובות)

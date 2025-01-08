@@ -737,10 +737,14 @@ select.search-input option {
 
     // הגדרת הפילטרים לפי ערכים ידועים
     const savedFilters = {
-        israel: selectedFilters.includes("בארץ"),
-        abroad: selectedFilters.includes("חו''ל"),
-        saas: selectedFilters.includes("Saas"),
-        nonSaas: selectedFilters.includes("No-Saas"),
+		israel: selectedFilters.includes("בארץ"),
+		abroad: selectedFilters.includes("חו''ל"),
+		nonSaas: selectedFilters.includes("No-Saas"),
+		saas: selectedFilters.includes("Saas"),
+		aws: selectedFilters.includes("AWS"),
+		gcp: selectedFilters.includes("GCP"),
+		r5: selectedFilters.includes("רובד 5"),
+		r1: selectedFilters.includes("רובד 1"),
         filters: selectedFilters,
         freeText: freeText,
         category: document.getElementById('categorySearch')?.value || ""

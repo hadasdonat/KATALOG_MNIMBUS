@@ -98,7 +98,13 @@
 document.addEventListener("DOMContentLoaded", function () {
     // אחזור הפילטרים מה-Session Storage
     const savedFilters = JSON.parse(sessionStorage.getItem('filters') || '{}');
-    const { filters = [], freeText = "", category = "", israel = false, abroad = false, saas = false, nonSaas = false } = savedFilters;
+    const { filters = [], freeText = "", category = "", israel = false, abroad = false, nonSaas = false, saas = false, aws = false, gcp = false, r5 = false, r1 = false } = savedFilters;
+	
+	Object.entries(savedFilters).forEach(x => {
+		if (x[1] === true) {
+			document.getElementById(x[0]).checked = true;
+		}
+	});
 
     // טעינת הנתונים משני הקבצים
     Promise.all([
@@ -160,8 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const matchesSaas = 
                 (saas && isSaas) || 
-                (nonSaas && isNonSaas) || 
-                (!saas && !nonSaas); // תואם רק אם אף אחד מהפילטרים לא נבחר
+                (nonSaas && isNonSaas) 
 
 
         // סינון לפי טקסט חופשי (על כל השדות המוצגים)
