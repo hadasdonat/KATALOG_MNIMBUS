@@ -111,6 +111,15 @@
           <option value="cloud-erp">ERP בענן</option>
         </select>
       </div>
+      <div class="sort-container">
+        <select class="sort-input" id="sortOptions">
+          <option value="nameAsc">שם (A-Z)</option>
+          <option value="nameDesc">שם (Z-A)</option>
+          <option value="approvalDateAsc">תאריך אישור (מהישן לחדש)</option>
+          <option value="approvalDateDesc">תאריך אישור (מהחדש לישן)</option>
+        </select>
+      </div>
+      
 
       <button class="clear-filter-btn" onclick="clearFilters()">
         נקה סינון
@@ -119,6 +128,8 @@
       <div id="results-container" class="results-container">
         <!-- Results will be dynamically inserted here -->
       </div>
+      <p id="results-count" class="results-count">נמצאו 24 תוצאות</p>
+
     </div>
 
     <script>
@@ -164,6 +175,9 @@
         //   searchText: "",
         //   categorySearch: "",
         // };
+        document.getElementById("sortOptions").addEventListener("change", (e) => {
+          sortResults(e.target.value);
+          });
 
         // Setup event listeners
         ["israel", "abroad", "saas", "nonSaas"].forEach((filterId) => {
@@ -209,6 +223,8 @@
                          data-service-type="${item.Column7}"
                          data-company="${item.Column3}"
                          data-manufacturer="${item.Column4}">
+                        <div class="badge-layer5">רובד 5</div>
+
                         <h3>${item.Column5 || "ללא שם"}</h3>
                         <p class="description">${
                           item.Column6 || "ללא תיאור"
@@ -242,6 +258,46 @@
             .join("");
         }
 
+        function sortResults(criteria) {
+          const container = document.getElementById("results-container");
+          let cards = Array.from(container.querySelectorAll(".result-card"));
+
+          cards.sort((a, b) => {
+            switch (criteria) {
+              case "nameAsc":
+                return a
+                  .querySelector("h3")
+                  .textContent.localeCompare(b.querySelector("h3").textContent);
+              case "nameDesc":
+                return b
+                  .querySelector("h3")
+                  .textContent.localeCompare(a.querySelector("h3").textContent);
+              case "approvalDateAsc":
+                return (
+                  new Date(
+                    a.querySelector(".details p:nth-child(5)").textContent
+                  ) -
+                  new Date(
+                    b.querySelector(".details p:nth-child(5)").textContent
+                  )
+                );
+              case "approvalDateDesc":
+                return (
+                  new Date(
+                    b.querySelector(".details p:nth-child(5)").textContent
+                  ) -
+                  new Date(
+                    a.querySelector(".details p:nth-child(5)").textContent
+                  )
+                );
+              default:
+                return 0;
+            }
+          });
+
+          container.innerHTML = "";
+          cards.forEach((card) => container.appendChild(card));
+        }
        
 
         
@@ -258,6 +314,8 @@
           const cards = document.querySelectorAll(".result-card");
           const searchText = filters.searchText.toLowerCase();
           const categoryText = filters.categorySearch.toLowerCase();
+          let visibleCount = 0;
+ 
 
           cards.forEach((card) => {
             const text = card.textContent.toLowerCase();
@@ -283,11 +341,17 @@
             const categoryMatch =
               !categoryText || text.includes(categoryText);
 
+              const isVisible = serviceTypeMatch && searchMatch && categoryMatch;
+
             card.style.display =
               serviceTypeMatch && searchMatch && categoryMatch
                 ? "block"
                 : "none";
+                if (isVisible) visibleCount++;
+
           });
+          document.getElementById("results-count").textContent = `נמצאו ${visibleCount} תוצאות`;
+
         }
     
       function clearFilters() {

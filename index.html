@@ -19,6 +19,8 @@
         }
         .card {
             width: 308px;
+            height: 100px; /* גובה אחיד לכל הכרטיסיות */
+
             position: absolute;
             background: white;
             box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
@@ -30,9 +32,14 @@
             cursor: pointer;
         }
         .card img {
-            width: 96px;
-            height: 100px;
-        }
+            width: 70px; /* רוחב קבוע */
+    height: 90px; /* גובה קבוע */
+    object-fit: contain; /* שמירה על פרופורציות התמונה */
+    flex-shrink: 0; /* מונע מהתמונה להתכווץ */
+    margin-left: 16px; /* רווח מצד שמאל של התמונה */
+
+}
+
         .card-content {
             padding: 16px;
             display: flex;
@@ -50,11 +57,12 @@
             margin: 4px 0 0;
         }
         .filters {
-            display: flex;
-            gap: 16px;
-            position: absolute;
-            top: 550px;
-            right: 50px;
+            display: grid;
+    grid-template-columns: repeat(2, 1fr); /* שתי עמודות */
+    gap: 16px;
+    position: absolute;
+    top: 320px;
+    right: 185px;
         }
         .filters label {
             display: flex;
@@ -64,10 +72,27 @@
         .filters input {
             margin-left: 8px;
         }
+        .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* שתי עמודות */
+    gap: 10px; /* רווח בין העמודות והשורות */
+    padding: 10px;
+    width: 100%;
+    max-width: 400px; /* מגביל את הרוחב כך שהעמודות ייראו מסודרות */
+    margin: 0 auto;
+}
+
+.filters-grid label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+}
+
         .search-btn {
             position: absolute;
-            top: 780px;
-            right: 280px;
+            top: 550px;
+            right: 185px;
             background: #0045A3;
             color: white;
             border: none;
@@ -87,8 +112,8 @@
     /* background-position: left 1rem center; */
     background-size: 1em;
     position: absolute; /* או relative בהתאם למבנה */
-    top: 700px; /* המרחק מלמעלה */
-    right: 60px; /* המרחק מצד שמאל */
+    top: 480px; /* המרחק מלמעלה */
+    right: 185px; /* המרחק מצד שמאל */
     padding-left: 2.5rem;
     cursor: pointer;
 }
@@ -107,13 +132,13 @@ select.search-input option {
 
         .free-text {
             position: absolute;
-            top: 459px;
-            right: 90px;
+            top: 250px;
+            right: 200px;
             width: 300px;
         }
         .free-text input {
-            width: 100%;
-            height: 48px;
+            width: 75%;
+            height: 15px;
             padding: 12px 16px;
             border: 1px solid #8596AF;
             border-radius: 100px;
@@ -160,14 +185,467 @@ select.search-input option {
             gap: 16px;
             margin-bottom: 16px;
         }
+        .header-container {
+    display: flex;
+   top: 200px;
+   left: 310px;
+    height: 40%; /* הגובה של הקונטיינר – אפשר לשנות בהתאם לצורך */
+}
+
+.header-container h1 {
+    color: #0045A3;
+    font-size: 64px;
+    font-weight: 800;
+}
+.suggestions-box {
+    position: absolute;
+    top: 50px;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #8596AF;
+    border-radius: 8px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none; /* מוסתרת כברירת מחדל */
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.suggestions-box div {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.suggestions-box div:hover {
+    background-color: #f0f0f0;
+}
+body {
+    /* margin: 0;
+    font-family: 'Rubik', sans-serif;
+    direction: rtl;
+    width: 100vw; /* 100% מרוחב המסך */
+    /* height: 100vh; /* 100% מגובה המסך */
+    /* overflow-x: hidden; מונע גלילה אופקית */ */ */
+    font-family: 'Rubik', sans-serif;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 1440px;
+    height: 1024px;
+    position: relative;
+    background: white;
+    padding-top: 64px;
+    margin: 0 auto;
+}
+
+.page-title {
+    position: absolute;
+    left: 145px;
+    top: 200px;
+    text-align: right;
+    color: #0045A3;
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 96px;
+}
+.header-container h1 {
+    text-align: center; /* ממרכז את הכיתוב */
+    position: absolute;
+    top: 100px; /* מתאים את המרחק מהחלק העליון */
+    left: 50%; /* ממקם אופקית במרכז */
+    transform: translateX(-50%); /* מחזיר חצי מהרוחב כדי למרכז */
+    font-size: 48px; /* גודל כותרת */
+    font-weight: bold;
+    color: #0045A3; /* צבע כותרת */
+}
+
+.filter-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+.filter-section {
+  position: absolute;
+  left: 923px;
+  top: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.filter-options {
+    display: flex;
+    flex-wrap: nowrap; /* מניע שבירת שורה */
+    justify-content: flex-end; /* מסדר את כל הרכיבים מצד ימין */
+    align-items: center; /* ממרכז את הרכיבים אנכית */
+    gap: 16px; /* ריווח בין האלמנטים */
+}
+
+.checkbox-item {
+    display: flex;
+    flex-direction: row-reverse; /* הפוך את סדר האלמנטים */
+    justify-content: flex-start;
+    align-items: center;
+    gap: 8px; /* ריווח בין תיבת הסימון למלל */
+
+}
+
+.checkbox-input {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #8596AF;
+    position: relative;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #0068F5;
+    border-radius: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.search-container {
+    position: absolute;
+    left: 395px;
+    top: 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+.search-input {
+    padding: 12px 16px;
+    border: 1px solid #8596AF;
+    border-radius: 8px;
+    width: 200px;
+    font-family: 'Rubik', sans-serif;
+    text-align: right;
+}
+
+.home-button {
+    padding: 8px 16px;
+    background: #0045A3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.home-button:hover {
+    background: #003c8a;
+}
+
+.clear-filter-btn {
+    position: absolute;
+    left: 204px;
+    top: 317px;
+    padding: 12px 24px;
+    background: white;
+    border: 1px solid #0068F5;
+    color: #0068F5;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Rubik', sans-serif;
+}
+
+.results-container {
+    position: absolute;
+    top: 400px;
+    left: 85px;
+    right: 85px;
+    display: flex;
+    flex-wrap: wrap; /* מאפשר שבירה לשורות */
+    gap: 16px; /* ריווח בין הכרטיסיות */
+    justify-content: space-between; /* מסדר את הכרטיסיות באופן שווה */
+}
+
+.result-card {
+    background: white;
+    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    padding: 24px;
+    flex: 1 1 calc(50% - 16px); /* גודל כרטיסיה: חצי רוחב */
+    box-sizing: border-box; /* מבטיח שהריווח יילקח בחשבון */
+}
+
+select.search-input {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: white; /* רקע לבן */
+    color: #0C3058; /* צבע טקסט כהה */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: left 1rem center;
+    background-size: 1em;
+    padding-left: 2.5rem;
+    cursor: pointer;
+}
+
+select.search-input::-ms-expand {
+    display: none;
+}
+
+select.search-input option {
+    font-family: Rubik;
+    font-size: 16px;
+    padding: 8px;
+    color: #0C3058; /* צבע טקסט */
+    background-color: white; /* רקע לבן */
+}
+
+.header {
+    display: block;
+    width: 100%;
+    height: 64px;
+    padding: 0 40px; /* הגדלת המרווחים מצדדים */
+    background: white;
+    box-shadow: 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.header-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: 56px;
+    align-items: center;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.header-container > div {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-container button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.2s;
+}
+
+.main-search-button {
+    height: 48px;
+    padding: 12px 20px 12px 24px;
+    left: 1145px;
+    top: 670px;
+    position: absolute;
+    background: #0045A3;
+    border-radius: 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    display: inline-flex;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.main-search-button:hover {
+    background: #003c8a;
+}
+
+.search-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 40px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.header-logo {
+    height: 48px;
+    padding: 4px;
+    object-fit: contain;
+    cursor: pointer;
+    position: absolute;  /* מאפשר מיקום יחסית לאלמנט האב */
+    right: 110px;  /* מיקום הלוגו 20px מהקצה השמאלי */
+    top: 50%;  /* מיקום הלוגו במרכז ה-header */
+    transform: translateY(-50%);  /* ממרכז את הלוגו אנכית */
+}
+
+.search-form {
+    position: absolute;  /* מיקום מוחלט בתוך ה-header */
+    left: 20px;  /* מיקום החיפוש 20px מהקצה הימני */
+    top: 50%;  /* מיקום החיפוש במרכז ה-header */
+    transform: translateY(-50%);  /* ממרכז את החיפוש אנכית */
+    display: flex;
+    align-items: center;
+}
+
+.search-form input {
+    width: 100%;
+    height: 28px;
+    padding: 8px 40px 8px 16px;
+    border: 1px solid #8596AF;
+    border-radius: 100px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 16px;
+    text-align: right;
+    outline: none;
+}
+
+.search-form input:focus {
+    border-color: #0068F5;
+    box-shadow: 0 0 0 2px rgba(0, 104, 245, 0.2);
+}
+
+.search-form .search-button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-form .search-button svg {
+    color: #8596AF;
+}
+
+.search-form .search-button:hover svg {
+    color: #0068F5;
+}
+
+.search-area {
+    height: 28px;
+    left: 978px;
+    top: 571px;
+    position: absolute;
+    width: 300px;
+}
+
+.search-input-main {
+    height: 28px;
+    padding: 8px 40px 8px 16px;
+    background: white;
+    border-radius: 100px;
+    border: 1px solid #8596AF;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.search-input-main input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-family: 'Rubik', sans-serif;
+    font-size: 16px;
+    text-align: right;
+}
+
+.search-input-main:focus-within {
+    border-color: #0068F5;
+    box-shadow: 0 0 0 2px rgba(0, 104, 245, 0.2);
+}
+
+.search-icon {
+    width: 24px;
+    height: 24px;
+    padding: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.loading-indicator {
+    width: 14px;
+    height: 20px;
+    background: #0C3058;
+    animation: pulse 1.5s infinite;
+}
+.header-logo {
+    margin-left: auto; /* דוחף את הלוגו לימין */
+}
+
+  
         
     </style>
+    <header class="header">
+        <div class="header-container">
+          <div>
+            <a href="/">
+              <img
+                class="header-logo"
+                src="https://c.animaapp.com/17bVmHgi/img/-----------1@2x.png"
+                alt="Logo"
+              />
+            </a>
+           
+          </div>
+          <form class="search-form" onsubmit="handleHeaderSearch(event)">
+            <input type="text" id="header-search" placeholder="חיפוש" />
+            <button type="submit" class="search-button">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+          </form>
+        </div>
+      </header>
 </head>
+
 <body>
     <div class="container">
-        <h1 style="position:absolute;top:225px;left:223px;color:#0045A3;font-size:64px;font-weight:800;">ברוכים הבאים לקטלוג מוצרי נימבוס</h1>
-
-        <div class="card" style="top:760px;left:103px;" onclick="location.href='AWSM.html';">
+        <!-- <h1 style="position:absolute;top:225px;left:450px;color:#0045A3;font-size:64px;font-weight:800;">קטלוג מוצרי נימבוס</h1> -->
+        <div class="header-container">
+            <h1>קטלוג מוצרי נימבוס</h1>
+        </div>
+        
+        <div class="card" style="top:250px;left:275px;" onclick="location.href='AWSM.html';">
             <div class="card-content">
                 <h3>AWS</h3>
                 <p>לקטגוריות</p>
@@ -175,34 +653,43 @@ select.search-input option {
             <img src="images\AWS-Emblem.png" alt="AWS">
         </div>
 
-        <div class="card" style="top:604px;left:103px;" onclick="location.href='gcp.html';">
+        <div class="card" style="top:510px;left:275px;" onclick="location.href='gcp.html';">
             <div class="card-content">
                 <h3>GCP</h3>
                 <p>לקטגוריות</p>
             </div>
-            <img src="images\OIP.jpeg" alt="GCP">
-        </div>
+            <img src="images\R.png" alt="GCP">
+        </div>\
 
-        <div class="card" style="top:459px;left:103px;" onclick="location.href='ROVED5.html';">
-            <div class="card-content">
-                <h3>רובד 5</h3>
-            </div>
-            <img src="" alt="רובד 5">
+        <div class="card" style="top:380px;left:275px;">
+                <div class="card-content">
+                    <h3>שירותי רובד 5</h3>
+                    <p>marketplace</p>
+                </div>
+                <img src="images\nimbus digital.png" alt="רובד 5">
+                <a href="https://www.appsheet.com/start/6698b5ff-dd9b-403d-80b5-3f471b5d9d8e#vss=H4sIAAAAAAAAA72QPQrCQBBGr7JMHUubbcVCRBvFxrVYkwks5keSjRrCHsKIRUCsYy4013ETFWuL2M18A-_xTQEHhceFlu4O-Lr4blPMgUMhYJnvUQAXMIojncSBAEfAXIavkGp6UEV3alg31HSlhipGpR1KurEB67IzXdhQgAGzcT4SjSnwogcH_0MPB5SHkVa-wqQVtngresPtuUXb4CcwGAfCTMttgN1_LNgYm_mxm6XorWypvsqkk2h82svIm8We9foySNE8AVDFj50eAgAA&view=%D7%A8%D7%A9%D7%99%D7%9E%D7%AA%20%D7%A9%D7%99%D7%A8%D7%95%D7%AA%D7%99%20%D7%92%D7%95%D7%92%D7%9C%20-%20%D7%A8%D7%95%D7%91%D7%93%205&appName=%D7%A8%D7%95%D7%91%D7%935-%D7%92%D7%95%D7%92%D7%9C%D7%A6%D7%A4%D7%99%D7%99%D7%94%D7%91%D7%9C%D7%91%D7%93-786456195" 
+                target="_blank" style="text-decoration: none; color: inherit;">
+            </a>
         </div>
 
         <div class="free-text">
-            <input type="text" placeholder="מלל חופשי">
+            <input type="text" id="freeTextInput" placeholder="מלל חופשי" oninput="showSuggestions()" autocomplete="off">
+            <div id="suggestions" class="suggestions-box"></div>
         </div>
 
         <div class="filters">
-            <h3>סינון תוצאות:</h3>
+            <!-- <h3>סינון תוצאות:</h3> -->
             <label><input type="checkbox" name="filter" value="בארץ"> בארץ</label>
             <label><input type="checkbox" name="filter" value="חו''ל"> חו''ל</label>
             <label><input type="checkbox" name="filter" value="No-Saas"> No-Saas</label>
             <label><input type="checkbox" name="filter" value="Saas"> Saas</label>
+            <label><input type="checkbox" name="filter" value="AWS"> AWS</label>
+            <label><input type="checkbox" name="filter" value="GCP"> GCP</label>
+            <label><input type="checkbox" name="filter" value="רובד 5"> רובד 1</label>
+            <label><input type="checkbox" name="filter" value="רובד 1"> רובד 5</label>
         </div>
 
-        <div class="additional-checkboxes">
+        <!-- <div class="additional-checkboxes">
             <div class="checkbox-item">
                 <div>AWS</div>
                 <div class="checkbox-box" onclick="toggleCheckbox(this)"></div>
@@ -211,7 +698,7 @@ select.search-input option {
                 <div>GCP</div>
                 <div class="checkbox-box" onclick="toggleCheckbox(this)"></div>
             </div>
-        </div>
+        </div> -->
       
 
 

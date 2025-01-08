@@ -8,14 +8,91 @@
 </head>
 <body>
     <div class="container">
-        <h1>תוצאות חיפוש</h1>
-        <div id="results-container" class="results-container">
-            <!-- התוצאות יתווספו כאן דינמית -->
+        <h1 class="page-title">  תוצאות חיפוש</h1>
+  
+        <div class="filter-section">
+          <div class="filter-header">
+            <span style="color: #ffffff; font-weight: 500">*</span>
+            <span style="color: #ffffff; font-weight: 500">סינון תוצאות</span>
+          </div>
+  
+          <div class="filter-options">
+            <label class="checkbox-item">
+              <span>בארץ</span>
+              <input type="checkbox" class="checkbox-input" id="israel" />
+              <div class="checkbox-custom"></div>
+            </label>
+            <label class="checkbox-item">
+              <span>חו"ל</span>
+              <input type="checkbox" class="checkbox-input" id="abroad" />
+              <div class="checkbox-custom"></div>
+            </label>
+            <label class="checkbox-item">
+              <span>No-Saas</span>
+              <input type="checkbox" class="checkbox-input" id="nonSaas" />
+              <div class="checkbox-custom"></div>
+            </label>
+            <label class="checkbox-item">
+              <span>Saas</span>
+              <input type="checkbox" class="checkbox-input" id="saas" />
+              <div class="checkbox-custom"></div>
+            </label>
+            <label class="checkbox-item">
+              <span>רובד 1</span>
+              <input type="checkbox" class="checkbox-input" id="layer1" />
+              <div class="checkbox-custom"></div>
+            </label>
+            <label class="checkbox-item">
+              <span>רובד 5</span>
+              <input type="checkbox" class="checkbox-input" id="layer5" />
+              <div class="checkbox-custom"></div>
+            </label>
+          </div>
+        </div>
+  
+        <div class="search-container">
+          <input
+            type="text"
+            class="search-input"
+            id="mainSearch"
+            placeholder="חיפוש"
+          />
+          <select class="search-input" id="categorySearch">
+            <option value="">כל הקטגוריות</option>
+            <option value="internet-of-things">האינטרנט של הדברים</option>
+            <option value="database">מאגרי מידע</option>
+            <option value="networking">רשתות והעברת תוכן</option>
+            <option value="business-applications">אפליקציות עסקיות</option>
+            <option value="frontend">פרונט-אנד - אתרי אינטרנט וניידים</option>
+            <option value="integration">אינטגרציה של אפליקציות</option>
+            <option value="end-user-computing">מחשוב למשתמשי קצה</option>
+            <option value="analytics">אנליטיקה</option>
+            <option value="machine-learning">למידת מכונה</option>
+            <option value="databases">מסדי נתונים</option>
+            <option value="migration">העברת נתונים</option>
+            <option value="serverless">ללא שרת</option>
+            <option value="financial">ניהול פיננסי בענן</option>
+            <option value="satellite">לוויינים</option>
+            <option value="robotics">רובוטיקה</option>
+            <option value="architecture">אסטרטגיית ארכיטקטורה</option>
+            <option value="marketplace">שוק</option>
+            <option value="cloud-erp">ERP בענן</option>
+          </select>
+        </div>
+  
+        <button class="clear-filter-btn" onclick="clearFilters()">
+          נקה סינון
+        </button>
+    <d<div id="results-container" class="results-container">
+        <!-- Results will be dynamically inserted here -->
+      </div>
+      <p id="results-count" class="results-count">נמצאו 0 תוצאות</p>
+
         </div>
         <button class="home-button"   style="position: absolute; top: 350px; right: 60px;"
         onclick="location.href='index.html'">לדף הבית</button>
               </div>
-    </div>
+    </div> 
 
     <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -111,7 +188,14 @@ document.addEventListener("DOMContentLoaded", function () {
     .catch(error => console.error("Error loading data:", error));
 
     function renderCards(data) {
+        console.log("מספר התוצאות שנמצאו:", data.length); // לוג לבדיקת מספר התוצאות
+
         const container = document.getElementById("results-container");
+        const resultsCountElement = document.getElementById("results-count");
+
+    // עדכון כמות התוצאות שנמצאו
+    resultsCountElement.textContent = `נמצאו ${data.length} תוצאות`;
+
         if (!data || data.length === 0) {
             container.innerHTML = '<div class="no-results">לא נמצאו תוצאות</div>';
             return;
@@ -124,6 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="result-card" 
                             data-source="gcp"
                             data-service-type="${item.category}">
+                            <div class="badge-layer5">רובד 5</div>
                             <h3>${item.name}</h3>
                             <p class="description">${item.description}</p>
                             <div class="details">
@@ -141,6 +226,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     return `
                         <div class="result-card" 
                             data-source="aws">
+                            <div class="badge-layer5">רובד 1</div>
+
                             <h3>${item.name}</h3>
                             <p class="description">${item.description}</p>
                             <div class="details">
