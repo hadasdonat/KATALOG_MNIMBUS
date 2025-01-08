@@ -102,8 +102,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // טעינת הנתונים משני הקבצים
     Promise.all([
-        fetch("GCP_5.json").then(response => response.json()),
-        fetch("mergedAWS.json").then(response => response.json())
+        fetch("./GCP_5.json").then(response => response.json()),
+        fetch("./mergedAWS.json").then(response => response.json())
     ])
     .then(([gcpData, awsData]) => {
         // עיבוד נתוני GCP

@@ -354,9 +354,9 @@
             data-source= "awsfirst"
                data-service-type="${item.Column7 || "לא זמין"}"
                data-company="${item.Column3 || "לא זמין"}"
-               data-manufacturer="${item.Column4 || "לא זמין"}">
+               data-manufacturer="${item || "לא זמין"}"
+               data-location="ישראל">
               <div class="badge-layer5">רובד 5</div>
-
               <h3>${item.Column5 || "ללא שם"}</h3>
               <p class="description">${item.Column6 || "ללא תיאור"}</p>
               <div class="details">
@@ -397,7 +397,8 @@
         return `
           <div class="result-card" 
                 data-source="aws-second-json"
-               data-service-type="custom-json">
+               data-service-type="custom-json"
+				data-location="${region}">
                              <div class="badge-layer5">רובד 1</div>
 
               <h3>${productName}</h3>
@@ -485,6 +486,7 @@ function sortResults(criteria) {
     cards.forEach((card) => {
       card.style.display = "block";
     });
+	  document.getElementById("results-count").textContent = `נמצאו ${cards.length} תוצאות`;
     return;
   }
   const searchText = filters.searchText?.toLowerCase() || "";
@@ -502,8 +504,9 @@ function sortResults(criteria) {
     let showCard = true;
 
     // בדיקת מיקום
-    const abroadMatch = filters.abroad && location === "abroad";
-    const israelMatch = filters.israel && location === "israel";
+    let locationMatch = true;
+    if (filters.abroad && location !== "חול ") locationMatch = false; // For some reason the space is crucial :(
+    if (filters.israel && location !== "ישראל") locationMatch = false;
 
     // סינון לפי רובד (אפשרות לרמות מרובות)
     const layer1Match = filters.layer1 && source === "aws-second-json";
@@ -530,12 +533,13 @@ function sortResults(criteria) {
     const categoryMatch = !categoryText || text.includes(categoryText);
 
     const isVisible =
-    showCard && serviceTypeMatch && searchMatch && categoryMatch;
+    showCard && serviceTypeMatch && searchMatch && categoryMatch && locationMatch;
 
     // הצגת כרטיס אם כל ההתניות מתקיימות
     card.style.display =
-      showCard && (abroadMatch || israelMatch || serviceTypeMatch) &&
+      showCard && serviceTypeMatch && 
       searchMatch &&
+		locationMatch &&
       categoryMatch
         ? "block"
         : "none";
