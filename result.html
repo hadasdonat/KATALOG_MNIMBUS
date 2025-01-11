@@ -153,13 +153,14 @@ document.addEventListener("DOMContentLoaded", function () {
     // טעינת הנתונים משני הקבצים
     Promise.all([
         fetch("GCP_5.json").then(response => response.json()),
-        fetch("mergedAWS.json").then(response => response.json())
+        fetch("mergedAWS.json").then(response => response.json()),
+        fetch("ragion.json").then(response => response.json())
     ])
-    .then(([gcpData, awsData]) => {
+    .then(([gcpData, awsData,awsRegion]) => {
         console.log("GCP Data Loaded:", gcpData);
         console.log("AWS Data Loaded:", awsData);
 
-        const processedData = processLoadedData(gcpData, awsData);
+        const processedData = processLoadedData(gcpData, awsData,awsRegion.prices.map(item => item.attributes));
         allItems = processedData;
         filterResults(); // סינון ראשוני על פי הפילטרים מה-Session Storage
     })
@@ -169,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setupEventListeners();
 });
 
-function processLoadedData(gcpData, awsData) {
+function processLoadedData(gcpData, awsData,awsRegion) {
     const filteredGCPData = (gcpData["שירותים מאושרים - GCP"] || [])
         .filter(item => item && typeof item === "object" && item.Column6)
         .map(item => ({
@@ -178,6 +179,7 @@ function processLoadedData(gcpData, awsData) {
             category: item.Column7 || "ללא קטגוריה",
             company: item.Column3 || "",
             manufacturer: item.Column4 || "",
+            inIsrael:true,
             source: "gcp",
             additional: {
                 contact: item.Column10 || "",
@@ -188,16 +190,21 @@ function processLoadedData(gcpData, awsData) {
         }));
 
     const processedAWSData = (awsData || [])
-        .map(item => ({
-            name: item.additionalFields?.productName || "ללא שם",
+        .map(item =>
+        { 
+            var inIsrael = awsRegion.some(rg=>rg['aws:serviceName']=== item.name && rg['aws:region']==='ap-east-1')
+        
+            return ({
+            name: item.name || "ללא שם",
             description: item.additionalFields?.productSummary || "ללא תיאור",
             category: item.additionalFields?.productCategory || "ללא קטגוריה",
-            regions: item.regions?.join(", ") || "לא זמין",
+            inIsrael,
+            regions:inIsrael? 'בארץ':'בחו"ל',
             source: "aws",
             additional: {
                 productUrl: item.additionalFields?.productUrl || "#"
             }
-        }));
+        }) });
 
     return [...filteredGCPData, ...processedAWSData];
 }
@@ -245,13 +252,13 @@ function filterResults() {
                              (filters.layer1 && isLayer1) ||
                              (filters.layer5 && isLayer5);
 
-        // **סינון לפי מיקום**
-        const isIsrael = item.regions?.includes("Israel") || item.additional?.contact?.includes("ישראל");
-        const isAbroad = !isIsrael; // כל מה שלא בישראל נחשב כחו"ל
+        // // **סינון לפי מיקום**
+        // const isIsrael = item.inIsrael
+        // const isAbroad = !item.isIsrael; // כל מה שלא בישראל נחשב כחו"ל
 
         const matchesLocation = (!filters.israel && !filters.abroad) ||
-                                (filters.israel && isIsrael) ||
-                                (filters.abroad && isAbroad);
+                                (filters.israel &&  item.inIsrael) ||
+                                (filters.abroad && !item.inIsrael);
             // **סינון לפי מקור (GCP / AWS)**
             const matchesSource = (!filters.gcp && !filters.aws) ||
                               (filters.gcp && item.source === "gcp") ||
