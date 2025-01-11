@@ -16,7 +16,7 @@
             <span style="color: #ffffff; font-weight: 500">סינון תוצאות</span>
           </div>
   
-          <div class="filter-options">
+          <div class="filter-options">h
             <label class="checkbox-item">
               <span>בארץ</span>
               <input type="checkbox" class="checkbox-input" id="israel" />
@@ -47,6 +47,28 @@
               <input type="checkbox" class="checkbox-input" id="layer5" />
               <div class="checkbox-custom"></div>
             </label>
+            <label class="checkbox-item">
+                <span>GCP</span>
+                <input type="checkbox" class="checkbox-input" id="gcp" />
+                <div class="checkbox-custom"></div>
+              </label>
+              <label class="checkbox-item">
+                <span>AWS</span>
+                <input type="checkbox" class="checkbox-input" id="aws" />
+                <div class="checkbox-custom"></div>
+              </label>
+          </div>
+          <div class="filter-footer">
+            <div class="sort-section">
+              <label for="sortOptions">סידור לפי:</label>
+              <select class="sort-input" id="sortOptions">
+                <option value="nameAsc">שם (A-Z)</option>
+                <option value="nameDesc">שם (Z-A)</option>
+                <option value="approvalDateAsc">תאריך אישור (מהישן לחדש)</option>
+                <option value="approvalDateDesc">תאריך אישור (מהחדש לישן)</option>
+              </select>
+            </div>
+            <p id="results-count" class="results-count">נמצאו 24 תוצאות</p>
           </div>
         </div>
   
@@ -89,165 +111,208 @@
       <p id="results-count" class="results-count">נמצאו 0 תוצאות</p>
 
         </div>
-        <button class="home-button"   style="position: absolute; top: 350px; right: 60px;"
+        <button class="home-button"   style="position: absolute; top: 270px; right: 40px;"
         onclick="location.href='index.html'">לדף הבית</button>
               </div>
     </div> 
 
     <script>
+let filters = {
+    israel: false,
+    abroad: false,
+    saas: false,
+    nonSaas: false,
+    layer1: false,
+    layer5: false,
+    gcp: false, // סינון לפי GCP
+    aws: false, // סינון לפי AWS
+    searchText: "",
+    category: "",
+};
+let allItems = []; // לאחסון כל הנתונים מה-JSON
+
 document.addEventListener("DOMContentLoaded", function () {
     // אחזור הפילטרים מה-Session Storage
     const savedFilters = JSON.parse(sessionStorage.getItem('filters') || '{}');
-    const { filters = [], freeText = "", category = "", israel = false, abroad = false, nonSaas = false, saas = false, aws = false, gcp = false, r5 = false, r1 = false } = savedFilters;
-	
-	Object.entries(savedFilters).forEach(x => {
-		if (x[1] === true) {
-			document.getElementById(x[0]).checked = true;
-		}
-	});
+    console.log("Loaded Filters:", savedFilters); // הוספת לוג לבדיקה
+
+    Object.entries(savedFilters).forEach(([key, value]) => {
+        if (typeof filters[key] !== "undefined") {
+            filters[key] = value;
+            const element = document.getElementById(key);
+            if (element && element.type === "checkbox") {
+                element.checked = value;
+            } else if (key === "searchText" && element) {
+                element.value = value;
+            } else if (key === "category" && element) {
+                element.value = value;
+            }
+        }
+    });
 
     // טעינת הנתונים משני הקבצים
     Promise.all([
-        fetch("./GCP_5.json").then(response => response.json()),
-        fetch("./mergedAWS.json").then(response => response.json())
+        fetch("GCP_5.json").then(response => response.json()),
+        fetch("mergedAWS.json").then(response => response.json())
     ])
     .then(([gcpData, awsData]) => {
-        // עיבוד נתוני GCP
-        const filteredGCPData = (gcpData["שירותים מאושרים - GCP"] || [])
-            .filter(item => item && typeof item === "object" && item.Column6)
-            .filter(item => {
-               // אם נבחר "חו"ל", לא לכלול נתוני GCP
-               if (abroad) return false;
-                // אם נבחר "בארץ" לכלול תמיד נתוני GCP
-                if (israel) return true;
-                return true; // כלל ברירת מחדל
-            })
-            .map(item => ({
-                name: item.Column5 || "ללא שם",
-                description: item.Column6 || "ללא תיאור",
-                category: item.Column7 || "ללא קטגוריה",
-                company: item.Column3 || "",
-                manufacturer: item.Column4 || "",
-                source: "gcp",
-                additional: {
-                    contact: item.Column10 || "",
-                    approvalDate: item.Column11 || "",
-                    notes: item.Column12 || "",
-                    pricingLink: item.Column9 || ""
-                }
-            }));
+        console.log("GCP Data Loaded:", gcpData);
+        console.log("AWS Data Loaded:", awsData);
 
-        // עיבוד נתוני AWS
-        const processedAWSData = (awsData || [])
-            .filter(item => {
-                const regions = item.regions?.join(", ") || "";
-                if (israel && !regions.includes("Israel")) return false;
-                if (abroad && regions.includes("Israel")) return false;
-                return true;
-            })
-            .map(item => ({
-                name: item.additionalFields?.productName || "ללא שם",
-                description: item.additionalFields?.productSummary || "ללא תיאור",
-                category: item.additionalFields?.productCategory || "ללא קטגוריה",
-                regions: item.regions?.join(", ") || "לא זמין",
-                source: "aws",
-                additional: {
-                    productUrl: item.additionalFields?.productUrl || "#"
-                }
-            }));
-
-        const combinedData = [...filteredGCPData, ...processedAWSData];
-
-        // סינון הנתונים לפי הפילטרים
-        const filteredData = combinedData.filter(item => {
-            // סינון לפי תיבות הסימון
-            const isSaas = item.category?.toLowerCase() === "saas"; // בדיקה מדויקת
-            const isNonSaas = item.category?.toLowerCase() === "non-saas"; // בדיקה מדויקת
-
-            const matchesSaas = 
-                (saas && isSaas) || 
-                (nonSaas && isNonSaas) 
-
-
-        // סינון לפי טקסט חופשי (על כל השדות המוצגים)
-        const matchesFreeText = !freeText || 
-                item.name?.toLowerCase().includes(freeText.toLowerCase()) ||
-                item.description?.toLowerCase().includes(freeText.toLowerCase()) ||
-                item.category?.toLowerCase().includes(freeText.toLowerCase()) ||
-                item.company?.toLowerCase().includes(freeText.toLowerCase()) ||
-                item.manufacturer?.toLowerCase().includes(freeText.toLowerCase());
-                    // סינון לפי קטגוריה
-            const matchesCategory = !category || item.category?.toLowerCase() === category.toLowerCase();
-
-            const matchesSource = 
-        (filters.includes("gcp") && item.source === "gcp") || 
-        (filters.includes("aws") && item.source === "aws") ||
-        (!filters.includes("gcp") && !filters.includes("aws")); // הצגת הכל אם אף מקור לא נבחר
-
-        return matchesSaas && matchesFreeText && matchesCategory && matchesSource;
-    });
-
-        // הצגת הכרטיסיות
-        renderCards(filteredData);
+        const processedData = processLoadedData(gcpData, awsData);
+        allItems = processedData;
+        filterResults(); // סינון ראשוני על פי הפילטרים מה-Session Storage
     })
     .catch(error => console.error("Error loading data:", error));
 
-    function renderCards(data) {
-        console.log("מספר התוצאות שנמצאו:", data.length); // לוג לבדיקת מספר התוצאות
+    // הוספת מאזינים לפילטרים
+    setupEventListeners();
+});
 
-        const container = document.getElementById("results-container");
-        const resultsCountElement = document.getElementById("results-count");
+function processLoadedData(gcpData, awsData) {
+    const filteredGCPData = (gcpData["שירותים מאושרים - GCP"] || [])
+        .filter(item => item && typeof item === "object" && item.Column6)
+        .map(item => ({
+            name: item.Column5 || "ללא שם",
+            description: item.Column6 || "ללא תיאור",
+            category: item.Column7 || "ללא קטגוריה",
+            company: item.Column3 || "",
+            manufacturer: item.Column4 || "",
+            source: "gcp",
+            additional: {
+                contact: item.Column10 || "",
+                approvalDate: item.Column11 || "",
+                notes: item.Column12 || "",
+                pricingLink: item.Column9 || ""
+            }
+        }));
 
-    // עדכון כמות התוצאות שנמצאו
+    const processedAWSData = (awsData || [])
+        .map(item => ({
+            name: item.additionalFields?.productName || "ללא שם",
+            description: item.additionalFields?.productSummary || "ללא תיאור",
+            category: item.additionalFields?.productCategory || "ללא קטגוריה",
+            regions: item.regions?.join(", ") || "לא זמין",
+            source: "aws",
+            additional: {
+                productUrl: item.additionalFields?.productUrl || "#"
+            }
+        }));
+
+    return [...filteredGCPData, ...processedAWSData];
+}
+
+function setupEventListeners() {
+    document.querySelectorAll(".checkbox-input").forEach((checkbox) => {
+        checkbox.addEventListener("change", (e) => {
+            filters[e.target.id] = e.target.checked;
+            filterResults();
+        });
+    });
+
+    document.getElementById("mainSearch").addEventListener("input", (e) => {
+        filters.searchText = e.target.value;
+        filterResults();
+    });
+
+    document.getElementById("categorySearch").addEventListener("change", (e) => {
+        filters.category = e.target.value;
+        filterResults();
+    });
+}
+
+function filterResults() {
+    const filteredData = allItems.filter(item => {
+        const isSaas = item.category?.toLowerCase() === "saas";
+        const isNonSaas = item.category?.toLowerCase() === "non-saas";
+        
+
+        const matchesSaas = (!filters.saas && !filters.nonSaas) ||
+                            (filters.saas && isSaas) ||
+                            (filters.nonSaas && isNonSaas);
+
+        const matchesFreeText = !filters.searchText ||
+                                item.name?.toLowerCase().includes(filters.searchText.toLowerCase()) ||
+                                item.description?.toLowerCase().includes(filters.searchText.toLowerCase());
+
+        const matchesCategory = !filters.category || item.category?.toLowerCase() === filters.category.toLowerCase();
+
+        // **סינון לפי רובד**
+        const isLayer1 = item.source === "aws"; // נחשב רובד 1 אם מקורו AWS
+        const isLayer5 = item.source === "gcp"; // נחשב רובד 5 אם מקורו GCP
+
+        const matchesLayer = (!filters.layer1 && !filters.layer5) || 
+                             (filters.layer1 && isLayer1) ||
+                             (filters.layer5 && isLayer5);
+
+        // **סינון לפי מיקום**
+        const isIsrael = item.regions?.includes("Israel") || item.additional?.contact?.includes("ישראל");
+        const isAbroad = !isIsrael; // כל מה שלא בישראל נחשב כחו"ל
+
+        const matchesLocation = (!filters.israel && !filters.abroad) ||
+                                (filters.israel && isIsrael) ||
+                                (filters.abroad && isAbroad);
+            // **סינון לפי מקור (GCP / AWS)**
+            const matchesSource = (!filters.gcp && !filters.aws) ||
+                              (filters.gcp && item.source === "gcp") ||
+                              (filters.aws && item.source === "aws");
+
+        // החזרת התוצאה אם כל התנאים מתקיימים
+        return matchesSaas && matchesFreeText && matchesCategory && matchesLayer && matchesLocation && matchesSource;
+
+
+
+    });
+
+    renderCards(filteredData);
+}
+
+function renderCards(data) {
+    const container = document.getElementById("results-container");
+    const resultsCountElement = document.getElementById("results-count");
+
     resultsCountElement.textContent = `נמצאו ${data.length} תוצאות`;
 
-        if (!data || data.length === 0) {
-            container.innerHTML = '<div class="no-results">לא נמצאו תוצאות</div>';
-            return;
-        }
-
-        container.innerHTML = data
-            .map(item => {
-                if (item.source === "gcp") {
-                    return `
-                        <div class="result-card" 
-                            data-source="gcp"
-                            data-service-type="${item.category}">
-                            <div class="badge-layer5">רובד 5</div>
-                            <h3>${item.name}</h3>
-                            <p class="description">${item.description}</p>
-                            <div class="details">
-                                <p><strong>חברה:</strong> ${item.company}</p>
-                                <p><strong>יצרן:</strong> ${item.manufacturer}</p>
-                                <p><strong>קטגוריה:</strong> ${item.category}</p>
-                                <p><strong>איש קשר:</strong> ${item.additional.contact}</p>
-                                <p><strong>מועד אישור:</strong> ${item.additional.approvalDate}</p>
-                                ${item.additional.notes ? `<p><strong>הערות:</strong> ${item.additional.notes}</p>` : ""}
-                                ${item.additional.pricingLink ? `<p><a href="${item.additional.pricingLink}" target="_blank">קישור למחירון</a></p>` : ""}
-                            </div>
-                        </div>
-                    `;
-                } else if (item.source === "aws") {
-                    return `
-                        <div class="result-card" 
-                            data-source="aws">
-                            <div class="badge-layer5">רובד 1</div>
-
-                            <h3>${item.name}</h3>
-                            <p class="description">${item.description}</p>
-                            <div class="details">
-                                <p><strong>קטגוריה:</strong> ${item.category}</p>
-                                <p><strong>אזורים:</strong> ${item.regions}</p>
-                                ${item.additional.productUrl ? `<a href="${item.additional.productUrl}" target="_blank">למידע נוסף</a>` : ""}
-                            </div>
-                        </div>
-                    `;
-                }
-                return "";
-            })
-            .join("");
+    if (!data.length) {
+        container.innerHTML = '<div class="no-results">לא נמצאו תוצאות</div>';
+        return;
     }
-});
+
+    container.innerHTML = data.map(item => {
+        if (item.source === "gcp") {
+            return `
+                <div class="result-card" data-source="gcp" data-layer="layer5" data-service-type="${item.category}">
+                    <div class="badge-layer5">רובד 5</div>
+                    <h3>${item.name}</h3>
+                    <p class="description">${item.description}</p>
+                    <div class="details">
+                        <p><strong>חברה:</strong> ${item.company}</p>
+                        <p><strong>יצרן:</strong> ${item.manufacturer}</p>
+                        <p><strong>קטגוריה:</strong> ${item.category}</p>
+                        <p><strong>איש קשר:</strong> ${item.additional.contact}</p>
+                        <p><strong>מועד אישור:</strong> ${item.additional.approvalDate}</p>
+                        ${item.additional.notes ? `<p><strong>הערות:</strong> ${item.additional.notes}</p>` : ""}
+                        ${item.additional.pricingLink ? `<p><a href="${item.additional.pricingLink}" target="_blank">קישור למחירון</a></p>` : ""}
+                    </div>
+                </div>
+            `;
+        } else if (item.source === "aws") {
+            return `
+                <div class="result-card" data-source="aws" data-layer="layer1">
+                    <div class="badge-layer5">רובד 1</div>
+                    <h3>${item.name}</h3>
+                    <p class="description">${item.description}</p>
+                    <div class="details">
+                        <p><strong>קטגוריה:</strong> ${item.category}</p>
+                        <p><strong>אזורים:</strong> ${item.regions}</p>
+                        ${item.additional.productUrl ? `<a href="${item.additional.productUrl}" target="_blank">למידע נוסף</a>` : ""}
+                    </div>
+                </div>
+            `;
+        }
+        return "";
+    }).join("");
+}
 
 
     </script>

@@ -80,6 +80,18 @@
             <div class="checkbox-custom"></div>
           </label>
         </div>
+           <div class="filter-footer">
+        <div class="sort-section">
+          <label for="sortOptions">סידור לפי:</label>
+          <select class="sort-input" id="sortOptions">
+            <option value="nameAsc">שם (A-Z)</option>
+            <option value="nameDesc">שם (Z-A)</option>
+            <option value="approvalDateAsc">תאריך אישור (מהישן לחדש)</option>
+            <option value="approvalDateDesc">תאריך אישור (מהחדש לישן)</option>
+          </select>
+        </div>
+        <p id="results-count" class="results-count">נמצאו 24 תוצאות</p>
+      </div>
       </div>
 
       <div class="search-container">
@@ -88,7 +100,11 @@
           class="search-input"
           id="mainSearch"
           placeholder="חיפוש"
+          list="autocomplete-options"
+
         />
+        <datalist id="autocomplete-options"></datalist>
+
         <select class="search-input" id="categorySearch">
           <option value="">כל הקטגוריות</option>
           <option value="internet-of-things">האינטרנט של הדברים</option>
@@ -111,15 +127,7 @@
           <option value="cloud-erp">ERP בענן</option>
         </select>
       </div>
-      <div class="sort-container">
-        <select class="sort-input" id="sortOptions">
-          <option value="nameAsc">שם (A-Z)</option>
-          <option value="nameDesc">שם (Z-A)</option>
-          <option value="approvalDateAsc">תאריך אישור (מהישן לחדש)</option>
-          <option value="approvalDateDesc">תאריך אישור (מהחדש לישן)</option>
-        </select>
-      </div>
-      
+   
 
       <button class="clear-filter-btn" onclick="clearFilters()">
         נקה סינון
@@ -127,12 +135,13 @@
 
       <div id="results-container" class="results-container">
         <!-- Results will be dynamically inserted here -->
-      </div>
+      <!-- </div>
       <p id="results-count" class="results-count">נמצאו 24 תוצאות</p>
 
-    </div>
-
+    </div> -->
+      </div>
     <script>
+      
      let filters = {
       israel: false,
       abroad: false,
@@ -166,15 +175,7 @@
             renderCards(gcpData);
           })
           .catch((error) => console.error("Error loading data:", error));
-        // Initialize filters
-        // const filters = {
-        //   israel: false,
-        //   abroad: false,
-        //   saas: false,
-        //   nonSaas: false,
-        //   searchText: "",
-        //   categorySearch: "",
-        // };
+       
         document.getElementById("sortOptions").addEventListener("change", (e) => {
           sortResults(e.target.value);
           });
@@ -207,6 +208,43 @@
           filters.layer5 = e.target.checked;
           filterResults();
         });
+        let productNames = []; // שמירת שמות המוצרים
+
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("GCP_5.json")
+    .then((response) => response.json())
+    .then((data) => {
+    console.log(data); // הדפסת הנתונים לקונסול
+
+      const gcpData = data["שירותים מאושרים - GCP"].filter(
+        (item) => item !== null
+      );
+
+      // שליפת כל שמות המוצרים
+      productNames = gcpData.map((item) => item.Column5 || "ללא שם");
+
+      // הוספת המוצרים ל-datalist
+      const datalist = document.getElementById("autocomplete-options");
+      productNames.forEach((name) => {
+        const option = document.createElement("option");
+        option.value = name;
+        datalist.appendChild(option);
+      });
+
+      // הצגת הכרטיסיות לאחר הטעינה
+      renderCards(gcpData);
+    })
+    .catch((error) => console.error("Error loading data:", error));
+});
+  
+
+document.getElementById("mainSearch").addEventListener("change", (e) => {
+  const selectedProduct = e.target.value.toLowerCase();
+  filters.searchText = selectedProduct; // שמירת המוצר שנבחר בפילטרים
+  filterResults(); // סינון הכרטיסיות
+});
+
+
 
         function renderCards(data) {
           const container = document.getElementById("results-container");
@@ -259,6 +297,8 @@
         }
 
         function sortResults(criteria) {
+          console.log("Sorting by:", criteria); // הדפסת סוג הסידור
+
           const container = document.getElementById("results-container");
           let cards = Array.from(container.querySelectorAll(".result-card"));
 
@@ -318,9 +358,12 @@
  
 
           cards.forEach((card) => {
-            const text = card.textContent.toLowerCase();
+            const text = card.querySelector("h3").textContent.toLowerCase();
             const serviceType = card.dataset.serviceType?.toLowerCase();
             const location = card.dataset.location?.toLowerCase();
+            const categoryMatch =
+            !categoryText || text.includes(categoryText);
+
 
             // אם נבחר "חו"ל" ולא נבחר "בארץ", הסתר הכל
             if (filters.abroad && !filters.israel) {
@@ -338,8 +381,7 @@
 
             const searchMatch = !searchText || text.includes(searchText);
 
-            const categoryMatch =
-              !categoryText || text.includes(categoryText);
+           
 
               const isVisible = serviceTypeMatch && searchMatch && categoryMatch;
 

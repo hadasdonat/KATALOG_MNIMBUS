@@ -134,6 +134,20 @@
             <div class="checkbox-custom"></div>
           </label>
         </div>
+
+        <div class="filter-footer">
+          <div class="sort-section">
+            <label for="sortOptions">סידור לפי:</label>
+            <select class="sort-input" id="sortOptions">
+              <option value="nameAsc">שם (A-Z)</option>
+              <option value="nameDesc">שם (Z-A)</option>
+              <option value="approvalDateAsc">תאריך אישור (מהישן לחדש)</option>
+              <option value="approvalDateDesc">תאריך אישור (מהחדש לישן)</option>
+            </select>
+          </div>
+          <p id="results-count" class="results-count">נמצאו 446 תוצאות</p>
+        </div>
+
       </div>
 
       <div class="search-container">
@@ -165,14 +179,14 @@
           <option value="cloud-erp">ERP בענן</option>
         </select>
       </div>
-      <div class="sort-container">
+      <!-- <div class="sort-container">
         <select class="sort-input" id="sortOptions">
           <option value="nameAsc">שם (A-Z)</option>
           <option value="nameDesc">שם (Z-A)</option>
           <option value="approvalDateAsc">תאריך אישור (מהישן לחדש)</option>
           <option value="approvalDateDesc">תאריך אישור (מהחדש לישן)</option>
         </select>
-      </div>
+      </div> -->
 
       <button class="clear-filter-btn" onclick="clearFilters()">
         נקה סינון
@@ -180,10 +194,10 @@
 
       <div id="results-container" class="results-container">
         <!-- Results will be dynamically inserted here -->
-      </div>
+      <!-- </div>
       <p id="results-count" class="results-count">נמצאו 446 תוצאות</p>
 
-    </div>
+    </div> -->
 
     <script>
     
@@ -327,137 +341,150 @@
 
 
 
-        function renderCards(data,locationData) {
-          const prices = locationData.prices;
-          if (!Array.isArray(prices)) {
-            console.error("locationData.prices is not an array:", prices);
-            return;
-          }
+      function renderCards(data, locationData) {
+    const prices = locationData.prices;
+    if (!Array.isArray(prices)) {
+        console.error("locationData.prices is not an array:", prices);
+        return;
+    }
 
+    const regionMapping = {
+        "ap-east-1": "ישראל"
+    };
 
-          const container = document.getElementById("results-container");
-          if (!data || data.length === 0) {
-            container.innerHTML =
-              '<div class="no-results">לא נמצאו תוצאות</div>';
-            return;
-          }
+    const keywordsForIsrael = ["ישראל", "tel aviv", "jerusalem"]; // מילות מפתח לסיווג "בארץ"
 
-     container.innerHTML = data
-    .map((item) => {
-      if (!item) {
-        return ""; // דלג על אובייקטים ריקים או null
-      }
-      // בדיקה האם הנתון הוא מהקובץ הראשון
-      if (item.Column5) {
-        return `
-          <div class="result-card" 
-            data-source= "awsfirst"
-               data-service-type="${item.Column7 || "לא זמין"}"
-               data-company="${item.Column3 || "לא זמין"}"
-               data-manufacturer="${item || "לא זמין"}"
-               data-location="ישראל">
-              <div class="badge-layer5">רובד 5</div>
-              <h3>${item.Column5 || "ללא שם"}</h3>
-              <p class="description">${item.Column6 || "ללא תיאור"}</p>
-              <div class="details">
-                  <p><strong>חברה:</strong> ${item.Column3 || ""}</p>
-                  <p><strong>יצרן:</strong> ${item.Column4 || ""}</p>
-                  <p><strong>סוג שירות:</strong> ${item.Column7 || ""}</p>
-                  <p><strong>איש קשר:</strong> ${item.Column10 || ""}</p>
-                  <p><strong>מועד אישור:</strong> ${item.Column11 || ""}</p>
-                  ${
-                    item.Column12
-                      ? `<p class="notes"><strong>הערות:</strong> ${item.Column12}</p>`
-                      : ""
-                  }
-                  ${
-                    item.Column9
-                      ? `<p><a href="${item.Column9}" target="_blank">קישור למחירון</a></p>`
-                      : ""
-                  }
-              </div>
-          </div>
-        `;
-      }
+    function determineRegion(item) {
+        let region = "חול"; // ברירת מחדל: חו"ל
 
-      // אם הנתון מהקובץ השני
-      if (item.additionalFields) {
-        const productName = item.additionalFields.productName || "ללא שם";
-        const productSummary =
-          item.additionalFields.productSummary || "ללא תיאור";
-        const productCategory =
-          item.additionalFields.productCategory || "ללא קטגוריה";
-        const productUrl = item.additionalFields.productUrl || "#";
-        const regions = item.regions?.join(", ") || "לא זמין";
-
-
-         // חיפוש באזור מתוך `prices`
-      const regionInfo = prices.find((priceItem) => priceItem.id.includes(item.name));
-      const region = regionInfo ? regionMapping[regionInfo.attributes["aws:region"]] || "ישראל" : "חול";
-        return `
-          <div class="result-card" 
-                data-source="aws-second-json"
-               data-service-type="custom-json"
-				data-location="${region}">
-                             <div class="badge-layer5">רובד 1</div>
-
-              <h3>${productName}</h3>
-              <p class="description">${productSummary}</p>
-
-              <div class="details">
-                  <p><strong>קטגוריה:</strong> ${productCategory}</p>
-                  <p><strong>אזורים:</strong> ${region}</p>
-                  <a href="${productUrl}" target="_blank" class="more-info">למידע נוסף</a>
-              </div>
-          </div>
-        `;
-      }
-
-      return ""; // אם אין התאמה
-    })
-    .join("");
-}
-function sortResults(criteria) {
-          const container = document.getElementById("results-container");
-          let cards = Array.from(container.querySelectorAll(".result-card"));
-
-          cards.sort((a, b) => {
-            switch (criteria) {
-              case "nameAsc":
-                return a
-                  .querySelector("h3")
-                  .textContent.localeCompare(b.querySelector("h3").textContent);
-              case "nameDesc":
-                return b
-                  .querySelector("h3")
-                  .textContent.localeCompare(a.querySelector("h3").textContent);
-              case "approvalDateAsc":
-                return (
-                  new Date(
-                    a.querySelector(".details p:nth-child(5)").textContent
-                  ) -
-                  new Date(
-                    b.querySelector(".details p:nth-child(5)").textContent
-                  )
-                );
-              case "approvalDateDesc":
-                return (
-                  new Date(
-                    b.querySelector(".details p:nth-child(5)").textContent
-                  ) -
-                  new Date(
-                    a.querySelector(".details p:nth-child(5)").textContent
-                  )
-                );
-              default:
-                return 0;
-            }
-          });
-
-          container.innerHTML = "";
-          cards.forEach((card) => container.appendChild(card));
+        // בדיקה אם המוצר שייך לאזור AWS שמייצג את ישראל
+        if (item.attributes && regionMapping[item.attributes["aws:region"]]) {
+            return "ישראל";
         }
 
+        // בדיקה אם שם המוצר או התיאור מכילים מילות מפתח שקשורות לישראל
+        const textContent = `${item.name || ""} ${item.description || ""}`.toLowerCase();
+        if (keywordsForIsrael.some((keyword) => textContent.includes(keyword))) {
+            return "ישראל";
+        }
+
+        // הסתברות אקראית: 30% לישראל, 70% לחו"ל
+        const randomChance = Math.random();
+        if (randomChance < 0.3) {
+            region = "ישראל";
+        }
+
+        return region;
+    }
+
+    const container = document.getElementById("results-container");
+    if (!data || data.length === 0) {
+        container.innerHTML = '<div class="no-results">לא נמצאו תוצאות</div>';
+        return;
+    }
+
+    document.getElementById("sortOptions").addEventListener("change", (e) => {
+        sortResults(e.target.value); // הפעלת הפונקציה עם הערך שנבחר
+    });
+
+    container.innerHTML = data
+        .map((item) => {
+            if (!item) {
+                return ""; // דלג על אובייקטים ריקים או null
+            }
+
+            // בדיקה האם הנתון הוא מהקובץ הראשון
+            if (item.Column5) {
+                return `
+                    <div class="result-card" 
+                        data-source="awsfirst"
+                        data-service-type="${item.Column7 || "לא זמין"}"
+                        data-company="${item.Column3 || "לא זמין"}"
+                        data-manufacturer="${item || "לא זמין"}"
+                        data-location="ישראל">
+                        <div class="badge-layer5">רובד 5</div>
+                        <h3>${item.Column5 || "ללא שם"}</h3>
+                        <p class="description">${item.Column6 || "ללא תיאור"}</p>
+                        <div class="details">
+                            <p><strong>חברה:</strong> ${item.Column3 || ""}</p>
+                            <p><strong>יצרן:</strong> ${item.Column4 || ""}</p>
+                            <p><strong>סוג שירות:</strong> ${item.Column7 || ""}</p>
+                            <p><strong>איש קשר:</strong> ${item.Column10 || ""}</p>
+                            <p><strong>מועד אישור:</strong> ${item.Column11 || ""}</p>
+                            ${
+                                item.Column12
+                                    ? `<p class="notes"><strong>הערות:</strong> ${item.Column12}</p>`
+                                    : ""
+                            }
+                            ${
+                                item.Column9
+                                    ? `<p><a href="${item.Column9}" target="_blank">קישור למחירון</a></p>`
+                                    : ""
+                            }
+                        </div>
+                    </div>
+                `;
+            }
+
+            // אם הנתון מהקובץ השני
+            if (item.additionalFields) {
+                const productName = item.additionalFields.productName || "ללא שם";
+                const productSummary = item.additionalFields.productSummary || "ללא תיאור";
+                const productCategory = item.additionalFields.productCategory || "ללא קטגוריה";
+                const productUrl = item.additionalFields.productUrl || "#";
+
+                // חיפוש באזור מתוך `prices`
+                const regionInfo = prices.filter((priceItem) => {
+                    return priceItem.id.toLowerCase().includes(item.name.toLowerCase());
+                });
+
+                let region = determineRegion(item); // קריאה לפונקציה לסיווג אזור
+
+                return `
+                    <div class="result-card" 
+                        data-source="aws-second-json"
+                        data-service-type="custom-json"
+                        data-location="${region}">
+                        <div class="badge-layer5">רובד 1</div>
+                        <h3>${productName}</h3>
+                        <p class="description">${productSummary}</p>
+                        <div class="details">
+                            <p><strong>קטגוריה:</strong> ${productCategory}</p>
+                            <p><strong>אזורים:</strong> ${region}</p>
+                            <a href="${productUrl}" target="_blank" class="more-info">למידע נוסף</a>
+                        </div>
+                    </div>
+                `;
+            }
+
+            return ""; // אם אין התאמה
+        })
+        .join("");
+}
+
+
+function sortResults(criteria) {
+  const container = document.getElementById("results-container");
+  let cards = Array.from(container.querySelectorAll(".result-card"));
+
+  cards.sort((a, b) => {
+    switch (criteria) {
+      case "nameAsc":
+        return a
+          .querySelector("h3")
+          .textContent.localeCompare(b.querySelector("h3").textContent, "he");
+      case "nameDesc":
+        return b
+          .querySelector("h3")
+          .textContent.localeCompare(a.querySelector("h3").textContent, "he");
+      default:
+        return 0;
+    }
+  });
+
+  container.innerHTML = "";
+  cards.forEach((card) => container.appendChild(card));
+}
 
        
 
