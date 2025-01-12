@@ -108,10 +108,10 @@
     <d<div id="results-container" class="results-container">
         <!-- Results will be dynamically inserted here -->
       </div>
-      <p id="results-count" class="results-count">נמצאו 0 תוצאות</p>
+      <!-- <p id="results-count" class="results-count">נמצאו 0 תוצאות</p> -->
 
         </div>
-        <button class="home-button"   style="position: absolute; top: 270px; right: 40px;"
+        <button class="home-button"   style="position: absolute; top: 270px; right: 100px;"
         onclick="location.href='index.html'">לדף הבית</button>
               </div>
     </div> 
@@ -150,27 +150,28 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 
-    // טעינת הנתונים משני הקבצים
     Promise.all([
-        fetch("GCP_5.json").then(response => response.json()),
-        fetch("mergedAWS.json").then(response => response.json()),
-        fetch("ragion.json").then(response => response.json())
-    ])
-    .then(([gcpData, awsData,awsRegion]) => {
-        console.log("GCP Data Loaded:", gcpData);
-        console.log("AWS Data Loaded:", awsData);
+    fetch("GCP_5.json").then(response => response.json()),
+    fetch("mergedAWS.json").then(response => response.json()),
+    fetch("ragion.json").then(response => response.json()),
+    fetch("FIVE.json").then(response => response.json()) // קובץ חדש של רובד 5 AWS
+])
+.then(([gcpData, awsData, awsRegion, awsLayer5Data]) => {
+    console.log("GCP Data Loaded:", gcpData);
+    console.log("AWS Data Loaded:", awsData);
+    console.log("AWS Layer 5 Data Loaded:", awsLayer5Data);
 
-        const processedData = processLoadedData(gcpData, awsData,awsRegion.prices.map(item => item.attributes));
-        allItems = processedData;
-        filterResults(); // סינון ראשוני על פי הפילטרים מה-Session Storage
-    })
-    .catch(error => console.error("Error loading data:", error));
 
+    const processedData = processLoadedData(gcpData, awsData, awsRegion.prices.map(item => item.attributes), awsLayer5Data);
+    allItems = processedData;
+    filterResults(); // סינון ראשוני על פי הפילטרים מה-Session Storage
+})
+.catch(error => console.error("Error loading data:", error));
     // הוספת מאזינים לפילטרים
     setupEventListeners();
 });
 
-function processLoadedData(gcpData, awsData,awsRegion) {
+function processLoadedData(gcpData, awsData, awsRegion, awsLayer5Data) {
     const filteredGCPData = (gcpData["שירותים מאושרים - GCP"] || [])
         .filter(item => item && typeof item === "object" && item.Column6)
         .map(item => ({
@@ -192,10 +193,10 @@ function processLoadedData(gcpData, awsData,awsRegion) {
     const processedAWSData = (awsData || [])
         .map(item =>
         { 
-            var inIsrael = awsRegion.some(rg=>rg['aws:serviceName']=== item.name && rg['aws:region']==='ap-east-1')
+            var inIsrael = awsRegion.some(rg=>rg['aws:serviceName']=== item.additionalFields?.productName && rg['aws:region']==='ap-east-1')
         
             return ({
-            name: item.name || "ללא שם",
+            name: item.additionalFields?.productName|| "ללא שם",
             description: item.additionalFields?.productSummary || "ללא תיאור",
             category: item.additionalFields?.productCategory || "ללא קטגוריה",
             inIsrael,
@@ -205,8 +206,27 @@ function processLoadedData(gcpData, awsData,awsRegion) {
                 productUrl: item.additionalFields?.productUrl || "#"
             }
         }) });
+        
+        const processedAWSLayer5Data = (awsLayer5Data["שירותים מאושרים - AWS"] || [])
+        .filter(item => item && typeof item === "object" && item.Column6)
 
-    return [...filteredGCPData, ...processedAWSData];
+        .map(item => ({
+            name: item.Column5 || "ללא שם",
+            description: item.Column6 || "ללא תיאור",
+            category: item.Column7 || "ללא קטגוריה",
+            company: item.Column3 || "",
+            manufacturer: item.Column4 || "",
+            inIsrael: true,
+            source: "aws-layer5",
+            additional: {
+                contact: item.Column10 || "",
+                approvalDate: item.Column11 || "",
+                notes: item.Column12 || "",
+                pricingLink: item.Column9 || ""
+            }
+        }));
+
+    return [...filteredGCPData, ...processedAWSData, ...processedAWSLayer5Data];
 }
 
 function setupEventListeners() {
@@ -232,7 +252,6 @@ function filterResults() {
     const filteredData = allItems.filter(item => {
         const isSaas = item.category?.toLowerCase() === "saas";
         const isNonSaas = item.category?.toLowerCase() === "non-saas";
-        
 
         const matchesSaas = (!filters.saas && !filters.nonSaas) ||
                             (filters.saas && isSaas) ||
@@ -246,29 +265,24 @@ function filterResults() {
 
         // **סינון לפי רובד**
         const isLayer1 = item.source === "aws"; // נחשב רובד 1 אם מקורו AWS
-        const isLayer5 = item.source === "gcp"; // נחשב רובד 5 אם מקורו GCP
+        const isLayer5 = item.source === "gcp" || item.source === "aws-layer5"; // רובד 5 אם מקורו GCP או AWS Layer 5
 
         const matchesLayer = (!filters.layer1 && !filters.layer5) || 
                              (filters.layer1 && isLayer1) ||
                              (filters.layer5 && isLayer5);
 
-        // // **סינון לפי מיקום**
-        // const isIsrael = item.inIsrael
-        // const isAbroad = !item.isIsrael; // כל מה שלא בישראל נחשב כחו"ל
-
+        // **סינון לפי מיקום**
         const matchesLocation = (!filters.israel && !filters.abroad) ||
-                                (filters.israel &&  item.inIsrael) ||
+                                (filters.israel && item.inIsrael) ||
                                 (filters.abroad && !item.inIsrael);
-            // **סינון לפי מקור (GCP / AWS)**
-            const matchesSource = (!filters.gcp && !filters.aws) ||
+
+        // **סינון לפי מקור (GCP / AWS)**
+        const matchesSource = (!filters.gcp && !filters.aws) ||
                               (filters.gcp && item.source === "gcp") ||
-                              (filters.aws && item.source === "aws");
+                              (filters.aws && (item.source === "aws" || item.source === "aws-layer5"));
 
         // החזרת התוצאה אם כל התנאים מתקיימים
         return matchesSaas && matchesFreeText && matchesCategory && matchesLayer && matchesLocation && matchesSource;
-
-
-
     });
 
     renderCards(filteredData);
@@ -316,10 +330,28 @@ function renderCards(data) {
                     </div>
                 </div>
             `;
+        } else if (item.source === "aws-layer5") {
+            return `
+                <div class="result-card" data-source="aws-layer5" data-layer="layer5">
+                    <div class="badge-layer5">רובד 5</div>
+                    <h3>${item.name}</h3>
+                    <p class="description">${item.description}</p>
+                    <div class="details">
+                        <p><strong>חברה:</strong> ${item.company}</p>
+                        <p><strong>יצרן:</strong> ${item.manufacturer}</p>
+                        <p><strong>קטגוריה:</strong> ${item.category}</p>
+                        <p><strong>איש קשר:</strong> ${item.additional.contact}</p>
+                        <p><strong>מועד אישור:</strong> ${item.additional.approvalDate}</p>
+                        ${item.additional.notes ? `<p><strong>הערות:</strong> ${item.additional.notes}</p>` : ""}
+                        ${item.additional.pricingLink ? `<p><a href="${item.additional.pricingLink}" target="_blank">קישור למחירון</a></p>` : ""}
+                    </div>
+                </div>
+            `;
         }
         return "";
     }).join("");
 }
+
 
 
     </script>

@@ -255,8 +255,7 @@ body {
     text-align: center; /* ממרכז את הכיתוב */
     position: absolute;
     top: 100px; /* מתאים את המרחק מהחלק העליון */
-    left: 50%; /* ממקם אופקית במרכז */
-    transform: translateX(-50%); /* מחזיר חצי מהרוחב כדי למרכז */
+    left: 550px; /* ממקם אופקית במרכז */
     font-size: 48px; /* גודל כותרת */
     font-weight: bold;
     color: #0045A3; /* צבע כותרת */
@@ -661,16 +660,14 @@ select.search-input option {
             <img src="images\R.png" alt="GCP">
         </div>\
 
-        <div class="card" style="top:380px;left:275px;">
-                <div class="card-content">
-                    <h3>שירותי רובד 5</h3>
-                    <p>marketplace</p>
-                </div>
-                <img src="images\nimbus digital.png" alt="רובד 5">
-                <a href="https://www.appsheet.com/start/6698b5ff-dd9b-403d-80b5-3f471b5d9d8e#vss=H4sIAAAAAAAAA72QPQrCQBBGr7JMHUubbcVCRBvFxrVYkwks5keSjRrCHsKIRUCsYy4013ETFWuL2M18A-_xTQEHhceFlu4O-Lr4blPMgUMhYJnvUQAXMIojncSBAEfAXIavkGp6UEV3alg31HSlhipGpR1KurEB67IzXdhQgAGzcT4SjSnwogcH_0MPB5SHkVa-wqQVtngresPtuUXb4CcwGAfCTMttgN1_LNgYm_mxm6XorWypvsqkk2h82svIm8We9foySNE8AVDFj50eAgAA&view=%D7%A8%D7%A9%D7%99%D7%9E%D7%AA%20%D7%A9%D7%99%D7%A8%D7%95%D7%AA%D7%99%20%D7%92%D7%95%D7%92%D7%9C%20-%20%D7%A8%D7%95%D7%91%D7%93%205&appName=%D7%A8%D7%95%D7%91%D7%935-%D7%92%D7%95%D7%92%D7%9C%D7%A6%D7%A4%D7%99%D7%99%D7%94%D7%91%D7%9C%D7%91%D7%93-786456195" 
-                target="_blank" style="text-decoration: none; color: inherit;">
-            </a>
-        </div>
+        <div class="card" style="position: absolute; top:380px; left:275px; cursor: pointer;" 
+        onclick="window.open('https://www.appsheet.com/start/6698b5ff-dd9b-403d-80b5-3f471b5d9d8e#vss=H4sIAAAAAAAAA72QPQrCQBBGr7JMHUubbcVCRBvFxrVYkwks5keSjRrCHsKIRUCsYy4013ETFWuL2M18A-_xTQEHhceFlu4O-Lr4blPMgUMhYJnvUQAXMIojncSBAEfAXIavkGp6UEV3alg31HSlhipGpR1KurEB67IzXdhQgAGzcT4SjSnwogcH_0MPB5SHkVa-wqQVtngresPtuUXb4CcwGAfCTMttgN1_LNgYm_mxm6XorWypvsqkk2h82svIm8We9foySNE8AVDFj50eAgAA&view=%D7%A8%D7%A9%D7%99%D7%9E%D7%AA%20%D7%A9%D7%99%D7%A8%D7%95%D7%AA%D7%99%20%D7%92%D7%95%D7%92%D7%9C%20-%20%D7%A8%D7%95%D7%91%D7%93%205&appName=%D7%A8%D7%95%D7%91%D7%935-%D7%92%D7%95%D7%92%D7%9C%D7%A6%D7%A4%D7%99%D7%99%D7%94%D7%91%D7%9C%D7%91%D7%93-786456195', '_blank');">
+     <div class="card-content">
+       <h3>שירותי רובד 5</h3>
+       <p>marketplace</p>
+     </div>
+     <img src="images/nimbus digital.png" alt="רובד 5">
+   </div>
 
         <div class="free-text">
             <input type="text" id="freeTextInput" placeholder="מלל חופשי" oninput="showSuggestions()" autocomplete="off">
@@ -685,21 +682,11 @@ select.search-input option {
             <label><input type="checkbox" name="filter" value="Saas"> Saas</label>
             <label><input type="checkbox" name="filter" value="AWS"> AWS</label>
             <label><input type="checkbox" name="filter" value="GCP"> GCP</label>
-            <label><input type="checkbox" name="filter" value="רובד 1"> רובד 1</label>
-            <label><input type="checkbox" name="filter" value="רובד 5"> רובד 5</label>
+            <label><input type="checkbox" name="filter" value="רובד 5"> רובד 1</label>
+            <label><input type="checkbox" name="filter" value="רובד 1"> רובד 5</label>
         </div>
 
-        <!-- <div class="additional-checkboxes">
-            <div class="checkbox-item">
-                <div>AWS</div>
-                <div class="checkbox-box" onclick="toggleCheckbox(this)"></div>
-            </div>
-            <div class="checkbox-item">
-                <div>GCP</div>
-                <div class="checkbox-box" onclick="toggleCheckbox(this)"></div>
-            </div>
-        </div> -->
-      
+       
 
 
         <select class="search-input" style="background-color: #ffffff; border: 1px solid #8596AF; border-radius: 8px; padding: 12px; width: 300px;" id="categorySearch">
@@ -737,16 +724,16 @@ select.search-input option {
 
     // הגדרת הפילטרים לפי ערכים ידועים
     const savedFilters = {
-		israel: selectedFilters.includes("בארץ"),
-		abroad: selectedFilters.includes("חו''ל"),
-		nonSaas: selectedFilters.includes("No-Saas"),
-		saas: selectedFilters.includes("Saas"),
-		aws: selectedFilters.includes("AWS"),
-		gcp: selectedFilters.includes("GCP"),
-		layer5: selectedFilters.includes("רובד 5"),
-		layer1: selectedFilters.includes("רובד 1"),
-        filters: selectedFilters,
-        freeText: freeText,
+        israel: selectedFilters.includes("בארץ"),
+        abroad: selectedFilters.includes("חו''ל"),
+        saas: selectedFilters.includes("Saas"),
+        nonSaas: selectedFilters.includes("No-Saas"),
+        layer1: selectedFilters.includes("רובד 1"),
+        layer5: selectedFilters.includes("רובד 5"),
+        gcp: selectedFilters.includes("GCP"),
+        aws: selectedFilters.includes("AWS"),
+        searchText: freeText,
+        // filters: selectedFilters,
         category: document.getElementById('categorySearch')?.value || ""
     };
 
